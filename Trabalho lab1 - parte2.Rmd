@@ -1,0 +1,63 @@
+---
+title: 'Relatório: 2ª Rodada Laboratório 1'
+author: "Joaquim e Isabelle"
+date: "07-11-2023"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE, message = FALSE)
+```
+
+```{r, include=FALSE}
+
+#Pacotes utilizados
+
+# install.packages("readxl")
+# install.packages("tidyverse")
+# install.packages("ggridges")
+# install.packages("scales")
+# install.packages("gmodels")
+# install.packages("ggplot2")
+# install.packages("caret")
+# install.packages("leaps")
+# install.packages("MASS")
+# install.packages("dplyr")
+# install.packages("reshape2")
+# install.packages("ggridges")
+# install.packages("kableExtra")
+
+
+library(ggplot2)
+library(caret)
+library(leaps)
+library(MASS)
+library(dplyr)
+library(readxl)
+library(tidyverse)
+library(reshape2)
+library(ggridges)
+library(scales)
+library(gmodels)
+library(tidyr)
+library(knitr)
+library(magrittr)
+library(kableExtra)
+```
+
+# 1. Introdução
+
+# 2 Metodologia
+
+# 3 Resultados
+
+## 3.1 Análise exploratória - Estatísticas descritivas
+
+```{r, echo = FALSE, include = FALSE}
+
+#Leitura e organizacao dos dados
+
+banco <- read_excel("PESQUISA - Experiências de turistas motivados por produções audiovisuais (respostas).xlsx",
+                    sheet = "Respostas ao formulário 1")
+
+```
