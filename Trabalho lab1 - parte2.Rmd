@@ -115,6 +115,7 @@ banco %>%
   theme(axis.title.x = element_blank()) +
   theme(legend.title = element_text(size = 10))
 ```
+
 ### Gráfico xx: Consumo de produções audiovisuais versus Tipo de turista
 
 ```{r}
@@ -137,6 +138,7 @@ banco %>%
   theme(legend.title = element_text(size = 10))
  
 ```
+
 Produções audiovisuais: Filmes, séries, telenovelas, clipes musicais e outros
 
 
@@ -209,6 +211,7 @@ banco %>%
   theme(axis.title.x = element_blank()) +
   theme(legend.title = element_text(size = 10))
 ```
+
 Plataforma de streaming: Netflix, Amazon Prime, Globo Play, etc.
 
 
