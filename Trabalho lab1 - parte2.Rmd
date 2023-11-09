@@ -3,7 +3,6 @@ title: 'Relatório: 2ª Rodada Laboratório 1'
 author: "Joaquim e Isabelle"
 date: "07-11-2023"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -48,7 +47,6 @@ library(knitr)
 library(magrittr)
 library(kableExtra)
 library(formattable)
-library(readxl)
 ```
 \newpage
 
@@ -93,6 +91,8 @@ library(readxl)
 banco <- read_excel("PESQUISA - Experiências de turistas motivados por produções audiovisuais (respostas).xlsx",
                     sheet = "Respostas ao formulário 1")
 banco <- as.data.frame(banco)
+
+names(banco)
 ```
 
 ```{r}
@@ -137,3 +137,36 @@ banco %>%
  
 ```
 Produções audiovisuais: Filmes, séries, telenovelas, clipes musicais e outros
+
+```{r}
+banco %>% 
+  group_by(`2. Faixa etária:`) %>% 
+  summarise(Quantidade=n()) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>% 
+  ggplot(aes(x=`2. Faixa etária:`, y=Quantidade, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_y_continuous(breaks = seq(0,40,5)) +
+  labs(title = "Gráfico xx - Faixa etária dos respondentes") +
+  theme(plot.title=element_text(hjust = 0.5, size=11, face = "bold")) + 
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10))
+
+
+```
+```{r}
+banco %>% 
+  group_by(`4. Nível de escolaridade concluído:`) %>% 
+  summarise(Quantidade=n()) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>% 
+  ggplot(aes(x=`4. Nível de escolaridade concluído:`, y=Quantidade, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_y_continuous(breaks = seq(0,40,5)) +
+  labs(title = "Nível de escolaridade dos respondentes ") +
+  theme(plot.title=element_text(hjust = 0.5, size=11, face = "bold")) + 
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) +
+  theme(axis.text.x = element_text(angle = -20, vjust = 0.5, hjust=0.5))
