@@ -3,6 +3,7 @@ title: 'Relatório: 2ª Rodada Laboratório 1'
 author: "Joaquim e Isabelle"
 date: "07-11-2023"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -47,6 +48,7 @@ library(knitr)
 library(magrittr)
 library(kableExtra)
 library(formattable)
+library(readxl)
 ```
 \newpage
 
@@ -91,8 +93,6 @@ library(formattable)
 banco <- read_excel("PESQUISA - Experiências de turistas motivados por produções audiovisuais (respostas).xlsx",
                     sheet = "Respostas ao formulário 1")
 banco <- as.data.frame(banco)
-
-names(banco)
 ```
 
 ```{r}
