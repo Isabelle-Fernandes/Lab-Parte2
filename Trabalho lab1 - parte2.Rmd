@@ -1,7 +1,7 @@
 ---
 title: 'Relatório: 2ª Rodada Laboratório 1'
 author: "Joaquim e Isabelle"
-date: "07-11-2023"
+date: "10-11-2023"
 output:
   pdf_document: default
   html_document:
@@ -60,13 +60,14 @@ library(formattable)
 ## 1.1 Objetivos Gerais do estudo
 
 <div style="text-align: justify">
-
+Compreender a motivação dos turistas para visitar determinada localidade influenciados pelo audiovisual.  
 <div/>
 
 ## 1.2 Objetivos Específicos
 
 <div style="text-align: justify">
-
+- Fazer uma análise por grupo de entrevistados; 
+- fazer uma análise estatística da pesquisa.  
 <div/>
 \newpage
 
