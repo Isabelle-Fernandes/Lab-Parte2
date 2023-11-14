@@ -95,45 +95,6 @@ banco <- as.data.frame(banco)
 
 ```
 
-```{r}
-a <- table(banco$`1. Qual foi o sexo atribuído no seu nascimento?`, banco$`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`)
-b <- table(banco$`4. Nível de escolaridade concluído:`, banco$`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`)
-
-a$CYP2D6POR<-factor(new_df2$CYP2D6POR, levels=c("NN","AN","NM","AM"),labels=c("Normal/Não-mutada","Alterada/Não-mutada","Normal/Mutada","Alterada/Mutada"))
-
-levels(a$Var1)
-
-rbind(a,b)
-
-b <- a %>% filter(Var1 == "Feminino" & Var2 == "Casual") %>% 
-  select(Freq)
-
-c <- a %>% filter(Var1 == "Feminino" & Var2 == "Específica") %>% 
-  select(Freq)
-  
-d <- a %>% filter(Var1 == "Feminino" & Var2 == "Geral") %>% 
-  select(Freq)
-
-e <- a %>% filter(Var1 == "Masculino" & Var2 == "Casual") %>% 
-  select(Freq)
-
-f <- a %>% filter(Var1 == "Masculino" & Var2 == "Específica") %>% 
-  select(Freq)
-
-g <- a %>% filter(Var1 == "Masculino" & Var2 == "Geral") %>% 
-  select(Freq)
-
-ma <- matrix(NA, nrow = 2, ncol = 3)
-
-o <- a %>% 
-  group_by(Var1) %>%
-  summarize(Min= min(`QPVS25D72/D0`,na.rm= T), Max= max(`QPVS25D72/D0`, na.rm= T),Mean = mean(`QPVS25D72/D0`, na.rm = TRUE),Median=median(`QPVS25D72/D0`, na.rm= T),SD = sd(`QPVS25D72/D0`, na.rm = TRUE)) %>%
-  ungroup()
-
-a <- as.data.frame(a)
-b <- as.data.frame(b)
-
-```
 
 ### Gráfico: Tipo de turista
 ```{r}
