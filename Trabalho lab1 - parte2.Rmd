@@ -96,53 +96,57 @@ banco <- as.data.frame(banco)
 ```
 
 
-### Gráfico xx: Sexo versus Tipo de turista
+### Gráfico: Tipo de turista
 ```{r}
 banco %>% 
-  group_by(`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`, 
-           `1. Qual foi o sexo atribuído no seu nascimento?`) %>% 
+  group_by(`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`) %>% 
   summarise(Quantidade=n()) %>% 
-  group_by(`1. Qual foi o sexo atribuído no seu nascimento?`) %>% 
   mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
-  ggplot(aes(x=`1. Qual foi o sexo atribuído no seu nascimento?`, y=Quantidade, 
-           fill=`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`,
+  ggplot(aes(x=`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`, y=Quantidade, 
            label = Percentual)) + 
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_fill_manual(name="Tipo turista", values=c('#9cd1f0','#368196',"#69b3a2")) +
+  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, ) +
+  theme(plot.title=element_text(hjust = 0.5, size=11, face = "bold")) + 
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10))
+```
+
+### Gráfico: Consumo de produção audiovisual
+```{r}
+dado <- strsplit(banco$`7. Quais os tipos de produção audiovisual você mais gosta de assistir? Se necessário, marque mais de uma opção.`, ",")
+
+dado <- str_trim(unlist(dado))
+
+coluna <- unique(dado)
+data <- data.frame(matrix(nrow = 1, ncol = 5))
+colnames(data) = coluna
+
+data <- data %>%
+  mutate(Filmes = sum(dado == "Filmes")) %>% 
+  mutate(Novelas = sum(dado == "Novelas")) %>% 
+  mutate(Seriados = sum(dado == "Seriados")) %>% 
+  mutate('Clipes de música' = sum(dado == "Clipes de música")) %>% 
+  mutate(Outros = sum(dado == "Outros"))
+
+data <- melt(data)
+
+data %>% 
+  mutate(Percentual = percent(value/sum(value),1)) %>% 
+  ggplot(aes(x=reorder(variable, -value), y=value, label = Percentual)) + 
+  geom_bar(stat = "identity", position = "dodge", fill ='#9cd1f0') +
   geom_label(position = position_dodge(width = 1), show.legend = F) +
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
   theme(legend.title = element_text(size = 10))
+
 ```
 
-### Gráfico xx: Consumo de produções audiovisuais versus Tipo de turista
+Entre os que citaram "Outros", descreveram: documentários, curtas, propagandas criativas, produtores de conteúdo nas redes sociais.
 
-```{r}
-banco %>% 
-  group_by(`8. Com que frequência você assiste a filmes, séries, telenovelas, clipes musicais ou outras produções audiovisuais?`, `12. A experiência turística e/ou cinematográfica vivida neste destino foi:`) %>% 
-  summarise(Quantidade=n()) %>% 
-  group_by(`8. Com que frequência você assiste a filmes, séries, telenovelas, clipes musicais ou outras produções audiovisuais?`) %>%
-  mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>%
-  ungroup() %>% 
-  ggplot(aes(x=`8. Com que frequência você assiste a filmes, séries, telenovelas, clipes musicais ou outras produções audiovisuais?`, y=Quantidade, 
-           fill=`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`, label = Percentual)) + 
-  geom_bar(stat = "identity",position = "dodge") +
-  scale_fill_manual(name="Tipo turista", values=c('#9cd1f0','#368196',"#60b3a2","#9cc1f0","#80b1b2")) +
-  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
-  scale_y_continuous(breaks = seq(0,40,5)) +
-  theme_light() +
-  theme(axis.title.y = element_blank()) + 
-  theme(axis.title.x = element_blank()) +
-  theme(axis.text.x = element_text(angle = -20, vjust = 0.5, hjust=0.5)) +
-  theme(legend.title = element_text(size = 10))
- 
-```
-
-Produções audiovisuais: Filmes, séries, telenovelas, clipes musicais e outros
-
-
-### Gráfico xx - Faixa etária dos respondentes
+### Gráfico: - Faixa etária dos respondentes
 ```{r}
 banco %>% 
   group_by(`2. Faixa etária:`) %>% 
@@ -160,7 +164,7 @@ banco %>%
 
 ```
 
-### Gráfico xx: Nível de escolaridade dos respondentes
+### Gráfico: Nível de escolaridade dos respondentes
 ```{r}
 banco %>% 
   group_by(`4. Nível de escolaridade concluído:`) %>% 
@@ -178,7 +182,7 @@ banco %>%
 ```
 
 
-### Gráfico xx: Região do Brasil onde os respondentes residem
+### Gráfico: Região do Brasil onde os respondentes residem
 ```{r}
 banco %>% 
   group_by(`5. Em qual região do Brasil você reside atualmente?`) %>% 
@@ -196,12 +200,13 @@ banco %>%
 ```
 
 
-### Gráfico xx: Respondente assina alguma plataforma de streaming
+### Gráfico: Respondente assina alguma plataforma de streaming
 ```{r}
 banco %>% 
   group_by(`9. Você assina alguma plataforma de streaming como Netflix, Amazon Prime, Globo Play, etc.?`) %>% 
   summarise(Quantidade=n()) %>% 
   mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>% 
+  na.omit(df) %>% 
   ggplot(aes(x=`9. Você assina alguma plataforma de streaming como Netflix, Amazon Prime, Globo Play, etc.?`, y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
@@ -215,12 +220,13 @@ banco %>%
 Plataforma de streaming: Netflix, Amazon Prime, Globo Play, etc.
 
 
-### Gráfico xx: Os locais retratados na produção audiovisual estavam de acordo com o local visitado
+### Gráfico: Os locais retratados na produção audiovisual estavam de acordo com o local visitado
 ```{r}
 banco %>% 
   group_by(`19. Na sua percepção, os locais retratados na produção audiovisual estavam de acordo com o que você presenciou no local visitado?`) %>% 
   summarise(Quantidade=n()) %>% 
   mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>% 
+  na.omit() %>% 
   ggplot(aes(x=`19. Na sua percepção, os locais retratados na produção audiovisual estavam de acordo com o que você presenciou no local visitado?`, y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
@@ -232,16 +238,101 @@ banco %>%
 ```
 
 
-### Gráfico xx: Nível de satisfação com a viagem induzida pelo audiovisual
+### Gráfico: Nível de satisfação com a viagem induzida pelo audiovisual
 ```{r}
 banco %>% 
   group_by(`22. Como você classificaria o seu nível de satisfação com a sua viagem induzida pelo audiovisual:`) %>% 
   summarise(Quantidade=n()) %>% 
   mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>% 
-  ggplot(aes(x=`22. Como você classificaria o seu nível de satisfação com a sua viagem induzida pelo audiovisual:`, y=Quantidade, label = Percentual)) + 
+  ggplot(aes(x=reorder(`22. Como você classificaria o seu nível de satisfação com a sua viagem induzida pelo audiovisual:`, -Quantidade), y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
   scale_y_continuous(breaks = seq(0,115,10)) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10))
+```
+
+### Gráfico: Plataforma de streaming utilizada
+
+```{r}
+dado <- strsplit(banco$`10. Qual? Se necessário, marque mais de uma opção.`, ",")
+
+dado <- str_trim(unlist(dado)) %>% 
+  na.omit()
+
+coluna <- unique(dado)
+data <- data.frame(matrix(nrow = 1, ncol = 9))
+colnames(data) = coluna
+
+data <- data %>%
+  mutate(Netflix = sum(dado == "Netflix")) %>% 
+  mutate(Globoplay = sum(dado == "Globoplay")) %>% 
+  mutate('Disney+' = sum(dado == "Disney+")) %>% 
+  mutate('HBO Max' = sum(dado == "HBO Max")) %>% 
+  mutate(Telecine = sum(dado == "Telecine")) %>% 
+  mutate('Amazon Prime Vídeo' = sum(dado == "Amazon Prime Vídeo")) %>% 
+  mutate('Star+' = sum(dado == 'Star+')) %>% 
+  mutate(Outros = sum(dado == "Outros")) %>% 
+  mutate(Viki = sum(dado == "Viki"))
+
+data <- melt(data)
+
+data %>% 
+  mutate(Percentual = percent(value/sum(value),1)) %>% 
+  ggplot(aes(x=reorder(variable, -value), y=value, label = Percentual)) + 
+  geom_bar(stat = "identity", position = "dodge", fill ='#9cd1f0') +
+  geom_label(position = position_dodge(width = 1), show.legend = F) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10))
+```
+
+Entre os que citaram "Outros", descreveram: Pluto TV, Apple TV, Hulu, My Família TV.
+
+```{r}
+
+```
+
+
+
+### Gráfico: Sexo versus Tipo de turista
+```{r}
+banco %>% 
+  group_by(`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`, 
+           `1. Qual foi o sexo atribuído no seu nascimento?`) %>% 
+  summarise(Quantidade=n()) %>% 
+  group_by(`1. Qual foi o sexo atribuído no seu nascimento?`) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  ggplot(aes(x=`1. Qual foi o sexo atribuído no seu nascimento?`, y=Percentual, 
+           fill=`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`,
+           label = Percentual)) + 
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(name="Tipo turista", values=c('#9cd1f0','#368196',"#69b3a2")) +
+  geom_label(position = position_dodge(width = 1), show.legend = F) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10))
+```
+
+### Gráfico: Sexo versus Tipo de turista
+
+```{r}
+banco %>% 
+  group_by(`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`, 
+           `1. Qual foi o sexo atribuído no seu nascimento?`) %>% 
+  summarise(Quantidade=n()) %>% 
+  group_by(`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  ggplot(aes(x=`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`, y=Percentual, 
+           fill=`1. Qual foi o sexo atribuído no seu nascimento?`, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, ) +
+  scale_fill_manual(name="Tipo turista", values=c('#9cd1f0','#368196',"#69b3a2")) +
+  theme(plot.title=element_text(hjust = 0.5, size=11, face = "bold")) + 
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
