@@ -93,6 +93,40 @@ Compreender a motivação dos turistas para visitar determinada localidade influ
 banco <- read_excel("respostas.xlsx", sheet = "Respostas ao formulário 1")
 banco <- as.data.frame(banco)
 
+banco_principais <- as.data.frame(banco[,c(3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,20,21,23,24,26,28)])
+
+names(banco_principais)[7] <- 'X'
+
+# Vou separar a coluna 7 em outras colunas para podermos trabalhar melhor com os dados
+
+# Funcao para checar se opcao foi marcada
+check_option <- function(string, option) {
+  options <- strsplit(string, ", ")[[1]]
+  if (option %in% options) {
+    return('1')
+  } else {
+    return('0')
+  }
+}
+
+# Apply the function to each row and create new columns
+banco_principais <- banco_principais %>%
+  mutate(Filmes = sapply(X, check_option, option = "Filmes"),
+         Novelas = sapply(X, check_option, option = "Novelas"),
+         Seriados = sapply(X, check_option, option = "Seriados"),
+         Clipes_de_musica = sapply(X, check_option, option = "Clipes de musica"))
+
+# Optionally, you can convert the new columns to factors
+banco_principais[, c("Filmes", "Novelas", "Seriados", "Clipes_de_musica")] <- lapply(banco_principais[, c("Filmes", "Novelas", "Seriados", "Clipes_de_musica")], as.factor)
+
+#removendo a coluna que dava todos dados juntos
+banco_principais <- subset(banco_principais, select = -X)
+
+names(banco_principais) <- c('Sexo', 'Idade', 'Profissao', 'Escolaridade', 'Regiao_residencia',
+                             'Cidade', 'Frequencia_audiovisuais', 'Streaming', 'Destino_viagem',
+                             'Experiencia', 'Producao', 'Motivacao', 'Finalidade', 'Lazer',
+                             'Sentimentos', 'Fidedigno', 'Companhia', 'Satisfacao', 'Expectativas',
+                             'Repetiria',"Filmes", "Novelas", "Seriados", "Clipes_de_musica")
 ```
 
 
