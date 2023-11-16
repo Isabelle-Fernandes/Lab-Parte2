@@ -118,10 +118,10 @@ banco_principais <- banco_principais %>%
          Novelas = sapply(X, check_option, option = "Novelas"),
          Seriados = sapply(X, check_option, option = "Seriados"),
          Clipes_de_musica = sapply(X, check_option, option = "Clipes de musica"),
-         Outros = sapply(X, check_option, option = "Outros"))
+         'Outro audiovisual' = sapply(X, check_option, option = "Outros"))
 
 # Optionally, you can convert the new columns to factors
-banco_principais[, c("Filmes", "Novelas", "Seriados", "Clipes_de_musica", "Outros")] <- lapply(banco_principais[, c("Filmes", "Novelas", "Seriados", "Clipes_de_musica", "Outros")], as.factor)
+banco_principais[, c("Filmes", "Novelas", "Seriados", "Clipes_de_musica", "Outros")] <- lapply(banco_principais[, c("Filmes", "Novelas", "Seriados", "Clipes_de_musica", "Outro audiovisual")], as.factor)
 
 #removendo a coluna que dava todos dados juntos
 banco_principais <- subset(banco_principais, select = -X)
@@ -153,24 +153,66 @@ banco_principais <- banco_principais %>%
          'Telecine' = sapply(X, check_option, option = "Telecine"),
          'Star+' = sapply(X, check_option, option = "Star+"),
          Viki = sapply(X, check_option, option = "Viki"),
-         Outros = sapply(X, check_option, option = "Outros"))
+         'Outros streamig' = sapply(X, check_option, option = "Outros"))
          
 
 #removendo a coluna que dava todos dados juntos
 banco_principais <- subset(banco_principais, select = -X)
-
-
 ```
-
 
 ```{r, echo = FALSE, include = FALSE}
-names(banco_principais) <- c('Sexo', 'Idade', 'Profissao', 'Escolaridade', 'Regiao_residencia',
-                             'Cidade', 'Frequencia_audiovisuais', 'Streaming', 'Destino_viagem',
-                             'Experiencia', 'Producao', 'Motivacao', 'Finalidade', 'Lazer',
-                             'Sentimentos', 'Fidedigno', 'Companhia', 'Satisfacao', 'Expectativas',
-                             'Repetiria',"Filmes", "Novelas", "Seriados", "Clipes_de_musica")
+names(banco_principais)[12] <- 'X'
+
+check_option <- function(string, option) {
+  options <- strsplit(gsub("\\., ", "--",string), "--")[[1]]
+  if (option %in% options) {
+    return(as.factor('1'))
+  } else {
+    return(as.factor('0'))
+  }
+}
+
+# Apply the function to each row and create new columns
+
+banco_principais <- banco_principais %>% 
+  mutate("Conhecer lugares retratados nas telas, incluindo cenários, paisagens, clima, culturas, etc" = sapply(X, check_option, option = "Conhecer lugares retratados nas telas, incluindo cenários, paisagens, clima, culturas, etc."),
+         "Outra motivação" = sapply(X, check_option, option = "Outros"),
+         "Outros (Audiovisual)" = sapply(X, check_option, option = "Outros (Audiovisual)"),
+         "Obter mais informações sobre o filme: enredo, trama, gênero, etc" = sapply(X, check_option, option = "Obter mais informações sobre o filme: enredo, trama, gênero, etc."),
+         "Conhecer personagens (Celebridades)" = sapply(X, check_option, option = "Conhecer personagens (Celebridades)"))
+        
+#removendo a coluna que dava todos dados juntos
+banco_principais <- subset(banco_principais, select = -X)
 ```
 
+```{r, echo = FALSE, include = FALSE}
+names(banco_principais)[13] <- 'X'
+
+check_option <- function(string, option) {
+  options <- strsplit(gsub("\\., ", "--",string), "--")[[1]]
+  if (option %in% options) {
+    return(as.factor('1'))
+  } else {
+    return(as.factor('0'))
+  }
+}
+
+# Apply the function to each row and create new columns
+
+banco_principais <- banco_principais %>% 
+  mutate("Visita a parques, praças e espaços na natureza exibidos na tela" = sapply(X, check_option, option = "Visita a parques, praças e espaços na natureza exibidos na tela"),
+         "Visita a Parques temáticos baseados em atrações inspiradas em séries, filmes, etc" = sapply(X, check_option, option = "Visita a Parques temáticos baseados em atrações inspiradas em séries, filmes, etc"),
+         "Visita a cenários internos ou externos onde foram filmadas" = sapply(X, check_option, option = "Visita a cenários internos ou externos onde foram filmadas"),
+         "Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas" = sapply(X, check_option, option = "Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas"),
+         "Participação em eventos relacionados a filmes" = sapply(X, check_option, option = "Participação em eventos relacionados a filmes"),
+         "Visita a estabelecimentos exibidos na tela, como bares, restaurantes e outros" = sapply(X, check_option, option = "Visita a estabelecimentos exibidos na tela, como bares, restaurantes e outros"),
+         "Realização de roteiros guiados em locais de filmagem" = sapply(X, check_option, option = "Realização de roteiros guiados em locais de filmagem"),
+         "Outra atividade" = sapply(X, check_option, option = "Outros"),
+         "Visita a patrimônios culturais exibidos na tela" = sapply(X, check_option, option = "Visita a patrimônios culturais exibidos na tela"))
+
+#removendo a coluna que dava todos dados juntos
+banco_principais <- subset(banco_principais, select = -X)
+```
 
 ### Gráfico: Tipo de turista
 ```{r}
@@ -436,3 +478,11 @@ banco %>%
 
 
 
+
+```{r, echo = FALSE, include = FALSE}
+names(banco_principais) <- c('Sexo', 'Idade', 'Profissao', 'Escolaridade', 'Regiao_residencia',
+                             'Cidade', 'Frequencia_audiovisuais', 'Streaming', 'Destino_viagem',
+                             'Experiencia', 'Producao', 'Motivacao', 'Finalidade', 'Lazer',
+                             'Sentimentos', 'Fidedigno', 'Companhia', 'Satisfacao', 'Expectativas',
+                             'Repetiria',"Filmes", "Novelas", "Seriados", "Clipes_de_musica")
+```
