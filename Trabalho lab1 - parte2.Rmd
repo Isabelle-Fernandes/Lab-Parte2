@@ -87,14 +87,17 @@ Compreender a motivação dos turistas para visitar determinada localidade influ
 ## 3.1 Análise exploratória - Estatísticas descritivas
 
 ```{r, echo = FALSE, include = FALSE}
-
 #Leitura e organizacao dos dados
 
 banco <- read_excel("respostas.xlsx", sheet = "Respostas ao formulário 1")
 banco <- as.data.frame(banco)
 
-banco_principais <- as.data.frame(banco[,c(3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,20,21,23,24,26,28)])
+banco_principais <- as.data.frame(banco[,c(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,23,24,26,28)])
 
+```
+
+
+```{r, echo = FALSE, include = FALSE}
 names(banco_principais)[7] <- 'X'
 
 # Vou separar a coluna 7 em outras colunas para podermos trabalhar melhor com os dados
@@ -114,14 +117,53 @@ banco_principais <- banco_principais %>%
   mutate(Filmes = sapply(X, check_option, option = "Filmes"),
          Novelas = sapply(X, check_option, option = "Novelas"),
          Seriados = sapply(X, check_option, option = "Seriados"),
-         Clipes_de_musica = sapply(X, check_option, option = "Clipes de musica"))
+         Clipes_de_musica = sapply(X, check_option, option = "Clipes de musica"),
+         Outros = sapply(X, check_option, option = "Outros"))
 
 # Optionally, you can convert the new columns to factors
-banco_principais[, c("Filmes", "Novelas", "Seriados", "Clipes_de_musica")] <- lapply(banco_principais[, c("Filmes", "Novelas", "Seriados", "Clipes_de_musica")], as.factor)
+banco_principais[, c("Filmes", "Novelas", "Seriados", "Clipes_de_musica", "Outros")] <- lapply(banco_principais[, c("Filmes", "Novelas", "Seriados", "Clipes_de_musica", "Outros")], as.factor)
 
 #removendo a coluna que dava todos dados juntos
 banco_principais <- subset(banco_principais, select = -X)
 
+```
+
+```{r, echo = FALSE, include = FALSE}
+names(banco_principais)[9] <- 'X'
+
+# Vou separar a coluna 7 em outras colunas para podermos trabalhar melhor com os dados
+
+# Funcao para checar se opcao foi marcada
+check_option <- function(string, option) {
+  options <- strsplit(string, ", ")[[1]]
+  if (option %in% options) {
+    return(as.factor('1'))
+  } else {
+    return(as.factor('0'))
+  }
+}
+
+# Apply the function to each row and create new columns
+banco_principais <- banco_principais %>%
+  mutate('Netflix' = sapply(X, check_option, option = "Netflix"),
+         Globoplay = sapply(X, check_option, option = "Globoplay"),
+         'Amazon Prime Vídeo' = sapply(X, check_option, option = "Amazon Prime Vídeo"),
+         'HBO Max' = sapply(X, check_option, option = "HBO Max"),
+         'Disney+' = sapply(X, check_option, option = "Disney+"),
+         'Telecine' = sapply(X, check_option, option = "Telecine"),
+         'Star+' = sapply(X, check_option, option = "Star+"),
+         Viki = sapply(X, check_option, option = "Viki"),
+         Outros = sapply(X, check_option, option = "Outros"))
+         
+
+#removendo a coluna que dava todos dados juntos
+banco_principais <- subset(banco_principais, select = -X)
+
+
+```
+
+
+```{r, echo = FALSE, include = FALSE}
 names(banco_principais) <- c('Sexo', 'Idade', 'Profissao', 'Escolaridade', 'Regiao_residencia',
                              'Cidade', 'Frequencia_audiovisuais', 'Streaming', 'Destino_viagem',
                              'Experiencia', 'Producao', 'Motivacao', 'Finalidade', 'Lazer',
@@ -327,6 +369,23 @@ data %>%
 Entre os que citaram "Outros", descreveram: Pluto TV, Apple TV, Hulu, My Família TV.
 
 ```{r}
+banco %>% 
+  group_by(`14. Qual foi a sua principal motivação para realizar essa viagem relacionada com o audiovisual?`) %>% 
+  summarise(Quantidade=n()) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>%
+  na.omit() %>% 
+  ggplot(aes(x=reorder(`14. Qual foi a sua principal motivação para realizar essa viagem relacionada com o audiovisual?`, -Quantidade), y=Quantidade, label = Percentual, fill = reorder(`14. Qual foi a sua principal motivação para realizar essa viagem relacionada com o audiovisual?`, -Quantidade))) + 
+  geom_bar(stat = "identity") +
+  scale_fill_manual(name="Motivação da viagem", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2")) +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  labs(x = NULL) +
+  scale_y_continuous(breaks = seq(0,115,10)) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.text.x = element_blank()) +
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) +
+  theme(legend.position = c(0.6, 0.75))
 
 ```
 
@@ -372,4 +431,8 @@ banco %>%
   theme(axis.title.x = element_blank()) +
   theme(legend.title = element_text(size = 10))
 ```
+
+
+
+
 
