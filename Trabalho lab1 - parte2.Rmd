@@ -1,7 +1,7 @@
 ---
 title: 'Relatório: 2ª Rodada Laboratório 1'
 author: "Joaquim e Isabelle"
-date: "10-11-2023"
+date: "17-11-2023"
 output:
   pdf_document: default
   html_document:
@@ -213,6 +213,52 @@ banco_principais <- banco_principais %>%
 #removendo a coluna que dava todos dados juntos
 banco_principais <- subset(banco_principais, select = -X)
 ```
+
+```{r, echo = FALSE, include = FALSE}
+names(banco_principais)[13] <- 'X'
+
+#a <- strsplit(banco_principais$X,", ")
+#unique(unlist(a))
+
+check_option <- function(string, option) {
+  options <- strsplit(gsub("\\., ", "--",string), "--")[[1]]
+  if (option %in% options) {
+    return(as.factor('1'))
+  } else {
+    return(as.factor('0'))
+  }
+}
+
+# Apply the function to each row and create new columns
+
+banco_principais <- banco_principais %>% 
+  mutate(Nostalgia = sapply(X, check_option, option = "Nostalgia"),
+         Autorrealização = sapply(X, check_option, option = "Autorrealização"),
+         "Escapismo da realidade" = sapply(X, check_option, option = "Escapismo da realidade"),
+         Fantasia = sapply(X, check_option, option = "Fantasia"),
+         Encantamento = sapply(X, check_option, option = "Encantamento"),
+         Romance = sapply(X, check_option, option = "Romance"),
+         "Superação de desafios" = sapply(X, check_option, option = "Superação de desafios"),
+         "Outro sentimento" = sapply(X, check_option, option = "Outros"))
+
+#removendo a coluna que dava todos dados juntos
+banco_principais <- subset(banco_principais, select = -X)
+```
+
+```{r}
+# banco_principais[14] é "21. Com quem você viajou?"
+
+# unique(banco_principais[14])
+
+for (i in 1:117) {
+  if(banco_principais[i,14] %in% c("Colegas","Ex namorado","Amigos e namorado.","Marido e outros familiares", "Sozinha ou com amigos e/ou familiares")){
+    banco_principais[i,14] = 'Outros'
+  }
+}
+
+
+```
+
 
 ### Gráfico: Tipo de turista
 ```{r}
