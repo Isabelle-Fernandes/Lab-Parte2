@@ -131,7 +131,7 @@ banco_principais <- subset(banco_principais, select = -X)
 ```{r, echo = FALSE, include = FALSE}
 names(banco_principais)[9] <- 'X'
 
-# Vou separar a coluna 7 em outras colunas para podermos trabalhar melhor com os dados
+# Vou separar a coluna 9 em outras colunas para podermos trabalhar melhor com os dados
 
 # Funcao para checar se opcao foi marcada
 check_option <- function(string, option) {
@@ -259,6 +259,36 @@ for (i in 1:117) {
 
 ```
 
+```{r}
+#Organizando o nome das variaveis do banco
+names(banco_principais) <- c('Sexo', 'Idade', 'Profissao', 'Escolaridade', 'Regiao_residencia',
+                             'Cidade', 'Frequencia_audiovisuais', 'Streaming', 'Destino_viagem',
+                             'Experiencia', 'Producao', 'Motivacao', 'Finalidade', 'Lazer',
+                             'Sentimentos', 'Fidedigno', 'Companhia', 'Satisfacao', 'Expectativas',
+                             'Repetiria',"Filmes", "Novelas", "Seriados", "Clipes_de_musica")
+
+
+#Organizando os tipos de variaveis do banco
+
+str(banco_principais)
+
+banco_principais$Sexo <- as.factor(banco_principais$Sexo)
+banco_principais$Idade <- as.factor(banco_principais$Idade)
+banco_principais$Escolaridade <- as.factor(banco_principais$Escolaridade)
+banco_principais$Regiao_residencia <- as.factor(banco_principais$Regiao_residencia)
+banco_principais$Frequencia_audiovisuais <- as.factor(banco_principais$Frequencia_audiovisuais)
+banco_principais$Streaming <- as.factor(banco_principais$Streaming)
+banco_principais$Experiencia <- as.factor(banco_principais$Experiencia)
+banco_principais$Finalidade <- as.factor(banco_principais$Finalidade)
+banco_principais$Lazer <- as.factor(banco_principais$Lazer)
+banco_principais$Sentimentos <- as.factor(banco_principais$Sentimentos)
+banco_principais$Fidedigno <- as.factor(banco_principais$Fidedigno)
+banco_principais$Companhia <- as.factor(banco_principais$Companhia)
+
+
+str(banco_principais)
+```
+
 
 ### Gráfico: Tipo de turista
 ```{r}
@@ -301,9 +331,9 @@ data %>%
   ggplot(aes(x=reorder(variable, -value), y=value, label = Percentual)) + 
   geom_bar(stat = "identity", position = "dodge", fill ='#9cd1f0') +
   geom_label(position = position_dodge(width = 1), show.legend = F) +
-  theme_light() +
+  theme_light() + 
   theme(axis.title.y = element_blank()) + 
-  theme(axis.title.x = element_blank()) +
+  theme(axis.title.x = element_blank()) + 
   theme(legend.title = element_text(size = 10))
 
 ```
@@ -520,15 +550,43 @@ banco %>%
   theme(legend.title = element_text(size = 10))
 ```
 
+# 4 Testes
 
+```{r}
+#str(banco_principais)
 
+#chisq.test(banco_principais$Sexo, banco_principais$Experiencia) #Nao relevante
+#chisq.test(banco_principais$Idade, banco_principais$Experiencia) #Nao relevante
+#chisq.test(banco_principais$Escolaridade, banco_principais$Experiencia) #Relevante
+#chisq.test(banco_principais$Regiao_residencia, banco_principais$Experiencia) #Nao relevante
+#chisq.test(banco_principais$Frequencia_audiovisuais, banco_principais$Experiencia) #Nao relevante
+#chisq.test(banco_principais$Streaming, banco_principais$Experiencia) #Nao relevante
+#chisq.test(banco_principais$Finalidade, banco_principais$Experiencia) #Nao relevante
+#chisq.test(banco_principais$Lazer, banco_principais$Experiencia) #Nao relevante
+#chisq.test(banco_principais$Sentimentos, banco_principais$Experiencia) #Nao relevante
+#chisq.test(banco_principais$Fidedigno, banco_principais$Experiencia) #Relevante
+#chisq.test(banco_principais$Companhia, banco_principais$Experiencia) #Nao relevante
 
+banco_factors <- banco_principais[, sapply(banco_principais, nlevels) > 1]
 
+#str(banco_factors)
 
-```{r, echo = FALSE, include = FALSE}
-names(banco_principais) <- c('Sexo', 'Idade', 'Profissao', 'Escolaridade', 'Regiao_residencia',
-                             'Cidade', 'Frequencia_audiovisuais', 'Streaming', 'Destino_viagem',
-                             'Experiencia', 'Producao', 'Motivacao', 'Finalidade', 'Lazer',
-                             'Sentimentos', 'Fidedigno', 'Companhia', 'Satisfacao', 'Expectativas',
-                             'Repetiria',"Filmes", "Novelas", "Seriados", "Clipes_de_musica")
+for (i in 1:ncol(banco_factors)){
+  print(paste(names(banco_factors[i]) , chisq.test(banco_factors[i], banco_factors$Experiencia)$p.value))
+}
+
 ```
+# 5 Modelos rapidos para discussao
+```{r}
+
+#utilizando as variaveis significativas no teste chi-quadrado alpha = 0.15
+
+modelo1 <- glm(Experiencia ~ Escolaridade + Sentimentos + Fidedigno + Satisfacao + NA.14,
+    data = banco_factors,
+    family = binomial)
+
+summary(modelo1)
+```
+
+
+
