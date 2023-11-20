@@ -1,7 +1,7 @@
 ---
 title: 'Relatório: 2ª Rodada Laboratório 1'
 author: "Joaquim e Isabelle"
-date: "1-11-2023"
+date: "17-11-2023"
 output:
   pdf_document: default
   html_document:
@@ -135,13 +135,7 @@ for (i in 1:117) {
 ```
 
 ```{r, echo = FALSE, include = FALSE}
-<<<<<<< HEAD
 names(banco)[7] <- 'X' #7. Quais os tipos de produção audiovisual você mais gosta de assistir? Se necessário, marque mais de uma opção.
-=======
-names(banco_principais)[9] <- 'X'
-
-# Vou separar a coluna 9 em outras colunas para podermos trabalhar melhor com os dados
->>>>>>> a25d8e391f9150b77b2ffcb0e90ccb3685e406a2
 
 # Funcao para checar se opcao foi marcada
 check_option1 <- function(string, option) {
@@ -294,36 +288,6 @@ result2 <- bancofator %>%
 
 ```
 
-```{r}
-#Organizando o nome das variaveis do banco
-names(banco_principais) <- c('Sexo', 'Idade', 'Profissao', 'Escolaridade', 'Regiao_residencia',
-                             'Cidade', 'Frequencia_audiovisuais', 'Streaming', 'Destino_viagem',
-                             'Experiencia', 'Producao', 'Motivacao', 'Finalidade', 'Lazer',
-                             'Sentimentos', 'Fidedigno', 'Companhia', 'Satisfacao', 'Expectativas',
-                             'Repetiria',"Filmes", "Novelas", "Seriados", "Clipes_de_musica")
-
-
-#Organizando os tipos de variaveis do banco
-
-str(banco_principais)
-
-banco_principais$Sexo <- as.factor(banco_principais$Sexo)
-banco_principais$Idade <- as.factor(banco_principais$Idade)
-banco_principais$Escolaridade <- as.factor(banco_principais$Escolaridade)
-banco_principais$Regiao_residencia <- as.factor(banco_principais$Regiao_residencia)
-banco_principais$Frequencia_audiovisuais <- as.factor(banco_principais$Frequencia_audiovisuais)
-banco_principais$Streaming <- as.factor(banco_principais$Streaming)
-banco_principais$Experiencia <- as.factor(banco_principais$Experiencia)
-banco_principais$Finalidade <- as.factor(banco_principais$Finalidade)
-banco_principais$Lazer <- as.factor(banco_principais$Lazer)
-banco_principais$Sentimentos <- as.factor(banco_principais$Sentimentos)
-banco_principais$Fidedigno <- as.factor(banco_principais$Fidedigno)
-banco_principais$Companhia <- as.factor(banco_principais$Companhia)
-
-
-str(banco_principais)
-```
-
 
 ### Gráfico: Turistas classificados segundo o grupo
 
@@ -378,7 +342,6 @@ chisq.test(banco$Grupo, banco$Sexo)
 
 ### Gráfico: Faixa etária por grupo
 
-<<<<<<< HEAD
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 grafico1 <- result[3:9,] %>% 
   ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
@@ -402,16 +365,8 @@ grafico2 <- banco %>%
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
   scale_fill_manual(name="Faixa etária", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0", "#708142")) + 
   theme_light() +
-=======
-data %>% 
-  mutate(Percentual = percent(value/sum(value),1)) %>% 
-  ggplot(aes(x=reorder(variable, -value), y=value, label = Percentual)) + 
-  geom_bar(stat = "identity", position = "dodge", fill ='#9cd1f0') +
-  geom_label(position = position_dodge(width = 1), show.legend = F) +
-  theme_light() + 
->>>>>>> a25d8e391f9150b77b2ffcb0e90ccb3685e406a2
   theme(axis.title.y = element_blank()) + 
-  theme(axis.title.x = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
   theme(legend.title = element_text(size = 10))
 
 plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
@@ -767,7 +722,6 @@ result2[1:5,] %>%
   theme(legend.title = element_text(size = 10))
 ```
 
-<<<<<<< HEAD
 Entre os que citaram "Outro audiovisual", descreveram: documentários, curtas, propagandas criativas, produtores de conteúdo nas redes sociais.
 
 
@@ -776,45 +730,6 @@ data <- banco[,c(7,13:17)]
 n <- length(names(data))
 
 nome <- names(data)
-=======
-# 4 Testes
-
-```{r}
-#str(banco_principais)
-
-#chisq.test(banco_principais$Sexo, banco_principais$Experiencia) #Nao relevante
-#chisq.test(banco_principais$Idade, banco_principais$Experiencia) #Nao relevante
-#chisq.test(banco_principais$Escolaridade, banco_principais$Experiencia) #Relevante
-#chisq.test(banco_principais$Regiao_residencia, banco_principais$Experiencia) #Nao relevante
-#chisq.test(banco_principais$Frequencia_audiovisuais, banco_principais$Experiencia) #Nao relevante
-#chisq.test(banco_principais$Streaming, banco_principais$Experiencia) #Nao relevante
-#chisq.test(banco_principais$Finalidade, banco_principais$Experiencia) #Nao relevante
-#chisq.test(banco_principais$Lazer, banco_principais$Experiencia) #Nao relevante
-#chisq.test(banco_principais$Sentimentos, banco_principais$Experiencia) #Nao relevante
-#chisq.test(banco_principais$Fidedigno, banco_principais$Experiencia) #Relevante
-#chisq.test(banco_principais$Companhia, banco_principais$Experiencia) #Nao relevante
-
-banco_factors <- banco_principais[, sapply(banco_principais, nlevels) > 1]
-
-#str(banco_factors)
-
-for (i in 1:ncol(banco_factors)){
-  print(paste(names(banco_factors[i]) , chisq.test(banco_factors[i], banco_factors$Experiencia)$p.value))
-}
-
-```
-# 5 Modelos rapidos para discussao
-```{r}
-
-#utilizando as variaveis significativas no teste chi-quadrado alpha = 0.15
-
-modelo1 <- glm(Experiencia ~ Escolaridade + Sentimentos + Fidedigno + Satisfacao + NA.14,
-    data = banco_factors,
-    family = binomial)
-
-summary(modelo1)
-```
->>>>>>> a25d8e391f9150b77b2ffcb0e90ccb3685e406a2
 
 lista <- list()
 
@@ -826,7 +741,6 @@ for (i in 1:(n-1)) {
   lista[[i]] <- resumo
 }
 
-<<<<<<< HEAD
 
 graficos1 <- lista[[1]] %>% 
   group_by(Grupo) %>% 
@@ -998,5 +912,3 @@ for (i in 1:ncol(bancofator)){
 
 #summary(modelo1)
 ```
-=======
->>>>>>> a25d8e391f9150b77b2ffcb0e90ccb3685e406a2
