@@ -869,7 +869,7 @@ result2[6:14,] %>%
 Entre os que citaram "Outros streaming", descreveram: Pluto TV, Apple TV, Hulu, My Família TV.
 
 ```{r, echo = FALSE, include = FALSE}
-data <- banco[,c(7,27:35)]
+data <- banco[,c(7,18:26)]
 n <- length(names(data))
 
 nome <- names(data)
@@ -888,7 +888,7 @@ for (i in 1:(n-1)) {
 graficos1 <- lista[[1]] %>% 
   group_by(Grupo) %>% 
   mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
-  ggplot(aes(x=Grupo, y=Percentual, label = Percentual, fill = `Amazon Prime Vídeo`)) + 
+  ggplot(aes(x=Grupo, y=Percentual, label = Percentual, fill = `Netflix`)) + 
   geom_bar(stat = "identity", position = "dodge") +
   geom_label(position = position_dodge(width = 1), show.legend = F) +
   scale_fill_manual(name="Netflix", values=c('#9cd1f0',"#69b3a2"), 
@@ -902,7 +902,7 @@ graficos1 <- lista[[1]] %>%
 graficos2 <- lista[[2]] %>% 
   group_by(Grupo) %>% 
   mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
-  ggplot(aes(x=Grupo, y=Percentual, label = Percentual, fill = `Amazon Prime Vídeo`)) + 
+  ggplot(aes(x=Grupo, y=Percentual, label = Percentual, fill = `Globoplay`)) + 
   geom_bar(stat = "identity", position = "dodge") +
   geom_label(position = position_dodge(width = 1), show.legend = F) +
   scale_fill_manual(name="Globoplay", values=c('#9cd1f0',"#69b3a2"), 
