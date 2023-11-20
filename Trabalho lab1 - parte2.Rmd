@@ -1,7 +1,7 @@
 ---
 title: 'Relatório: 2ª Rodada Laboratório 1'
 author: "Joaquim e Isabelle"
-date: "17-11-2023"
+date: "1-11-2023"
 output:
   pdf_document: default
   html_document:
@@ -30,6 +30,9 @@ knitr::opts_chunk$set(warning = FALSE, echo = TRUE, message = FALSE)
 # install.packages("ggridges")
 # install.packages("kableExtra")
 # install.packages("formattable")
+# install.packages("stringdist")
+# install.packages("cowplot")
+
 
 
 library(ggplot2)
@@ -48,6 +51,9 @@ library(knitr)
 library(magrittr)
 # library(kableExtra)
 library(formattable)
+library(stringdist)
+library(cowplot)
+
 ```
 \newpage
 
@@ -86,383 +92,440 @@ Compreender a motivação dos turistas para visitar determinada localidade influ
 
 ## 3.1 Análise exploratória - Estatísticas descritivas
 
+
 ```{r, echo = FALSE, include = FALSE}
 #Leitura e organizacao dos dados
 
 banco <- read_excel("respostas.xlsx", sheet = "Respostas ao formulário 1")
-banco <- as.data.frame(banco)
 
-banco_principais <- as.data.frame(banco[,c(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,23,24,26,28)])
+banco <- as.data.frame(banco[,c(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,23,24,26,28)])
 
 ```
 
 
 ```{r, echo = FALSE, include = FALSE}
-names(banco_principais)[7] <- 'X'
+# banco[,12] é "12. A experiência turística e/ou cinematográfica vivida neste destino foi:"
 
-# Vou separar a coluna 7 em outras colunas para podermos trabalhar melhor com os dados
+for (i in 1:117) {
+  if(banco[i,12] %in% c("Geral","Casual")){
+    banco[i,12] = 'Geral ou Casual'
+  }
+}
+
+# banco[4] é "4. Nível de escolaridade concluído:"
+
+# unique(banco[4])
+
+for (i in 1:117) {
+  if(banco[i,4] %in% c("Pos doutoramento","Livre docente")){
+    banco[i,4] = 'Doutorado'
+  }
+}
+
+# banco[19] é "21. Com quem você viajou?"
+
+# unique(banco[19])
+
+for (i in 1:117) {
+  if(banco[i,19] %in% c("Colegas","Ex namorado","Amigos e namorado.","Marido e outros familiares", "Sozinha ou com amigos e/ou familiares")){
+    banco[i,19] = 'Outros'
+  }
+}
+
+```
+
+```{r, echo = FALSE, include = FALSE}
+names(banco)[7] <- 'X' #7. Quais os tipos de produção audiovisual você mais gosta de assistir? Se necessário, marque mais de uma opção.
 
 # Funcao para checar se opcao foi marcada
-check_option <- function(string, option) {
+check_option1 <- function(string, option) {
   options <- strsplit(string, ", ")[[1]]
   if (option %in% options) {
-    return('1')
+    return(1)
   } else {
-    return('0')
+    return(0)
   }
 }
 
 # Apply the function to each row and create new columns
-banco_principais <- banco_principais %>%
-  mutate(Filmes = sapply(X, check_option, option = "Filmes"),
-         Novelas = sapply(X, check_option, option = "Novelas"),
-         Seriados = sapply(X, check_option, option = "Seriados"),
-         Clipes_de_musica = sapply(X, check_option, option = "Clipes de musica"),
-         'Outro audiovisual' = sapply(X, check_option, option = "Outros"))
-
-# Optionally, you can convert the new columns to factors
-banco_principais[, c("Filmes", "Novelas", "Seriados", "Clipes_de_musica", "Outros")] <- lapply(banco_principais[, c("Filmes", "Novelas", "Seriados", "Clipes_de_musica", "Outro audiovisual")], as.factor)
+banco <- banco %>%
+  mutate(Filmes = sapply(X, check_option1, option = "Filmes"),
+         Novelas = sapply(X, check_option1, option = "Novelas"),
+         Seriados = sapply(X, check_option1, option = "Seriados"),
+         'Clipes de música' = sapply(X, check_option1, option = "Clipes de música"),
+         'Outro audiovisual' = sapply(X, check_option1, option = "Outros"))
 
 #removendo a coluna que dava todos dados juntos
-banco_principais <- subset(banco_principais, select = -X)
+banco <- subset(banco, select = -X)
 
-```
 
-```{r, echo = FALSE, include = FALSE}
-names(banco_principais)[9] <- 'X'
-
-# Vou separar a coluna 7 em outras colunas para podermos trabalhar melhor com os dados
-
-# Funcao para checar se opcao foi marcada
-check_option <- function(string, option) {
-  options <- strsplit(string, ", ")[[1]]
-  if (option %in% options) {
-    return(as.factor('1'))
-  } else {
-    return(as.factor('0'))
-  }
-}
+names(banco)[9] <- 'X' #10. Qual? Se necessário, marque mais de uma opção.
 
 # Apply the function to each row and create new columns
-banco_principais <- banco_principais %>%
-  mutate('Netflix' = sapply(X, check_option, option = "Netflix"),
-         Globoplay = sapply(X, check_option, option = "Globoplay"),
-         'Amazon Prime Vídeo' = sapply(X, check_option, option = "Amazon Prime Vídeo"),
-         'HBO Max' = sapply(X, check_option, option = "HBO Max"),
-         'Disney+' = sapply(X, check_option, option = "Disney+"),
-         'Telecine' = sapply(X, check_option, option = "Telecine"),
-         'Star+' = sapply(X, check_option, option = "Star+"),
-         Viki = sapply(X, check_option, option = "Viki"),
-         'Outros streamig' = sapply(X, check_option, option = "Outros"))
+banco <- banco %>%
+  mutate('Netflix' = sapply(X, check_option1, option = "Netflix"),
+         Globoplay = sapply(X, check_option1, option = "Globoplay"),
+         'Amazon Prime Vídeo' = sapply(X, check_option1, option = "Amazon Prime Vídeo"),
+         'HBO Max' = sapply(X, check_option1, option = "HBO Max"),
+         'Disney+' = sapply(X, check_option1, option = "Disney+"),
+         'Telecine' = sapply(X, check_option1, option = "Telecine"),
+         'Star+' = sapply(X, check_option1, option = "Star+"),
+         Viki = sapply(X, check_option1, option = "Viki"),
+         'Outros streamig' = sapply(X, check_option1, option = "Outros"))
          
 
 #removendo a coluna que dava todos dados juntos
-banco_principais <- subset(banco_principais, select = -X)
-```
+banco <- subset(banco, select = -X)
 
-```{r, echo = FALSE, include = FALSE}
-names(banco_principais)[12] <- 'X'
 
-check_option <- function(string, option) {
-  options <- strsplit(gsub("\\., ", "--",string), "--")[[1]]
-  if (option %in% options) {
-    return(as.factor('1'))
+check_option2 <- function(string, option) {
+  options <- strsplit(string, "\\., ")[[1]]
+  distancia_corte <- 3
+  distancias <- stringdistmatrix(option, options, method = "lv")
+  if (is.na(any(distancias <= distancia_corte))){
+    return(NA)
+  } else if (any(distancias <= distancia_corte)) {
+    return(1)
   } else {
-    return(as.factor('0'))
+    return(0)
   }
 }
+
+names(banco)[14] <- 'X' #16. Quais atividades de lazer você realizou durante a viagem, relacionada ao audiovisual?
 
 # Apply the function to each row and create new columns
 
-banco_principais <- banco_principais %>% 
-  mutate("Conhecer lugares retratados nas telas, incluindo cenários, paisagens, clima, culturas, etc" = sapply(X, check_option, option = "Conhecer lugares retratados nas telas, incluindo cenários, paisagens, clima, culturas, etc."),
-         "Outra motivação" = sapply(X, check_option, option = "Outros"),
-         "Outros (Audiovisual)" = sapply(X, check_option, option = "Outros (Audiovisual)"),
-         "Obter mais informações sobre o filme: enredo, trama, gênero, etc" = sapply(X, check_option, option = "Obter mais informações sobre o filme: enredo, trama, gênero, etc."),
-         "Conhecer personagens (Celebridades)" = sapply(X, check_option, option = "Conhecer personagens (Celebridades)"))
-        
+banco <- banco %>% 
+  mutate("Visita a parques, praças e espaços na natureza exibidos na tela" = sapply(X, check_option2, option = "Visita a parques, praças e espaços na natureza exibidos na tela"),
+         "Visita a Parques temáticos baseados em atrações inspiradas em séries, filmes, etc" = sapply(X, check_option2, option = "Visita a Parques temáticos baseados em atrações inspiradas em séries, filmes, etc"),
+         "Visita a cenários internos ou externos onde foram filmadas" = sapply(X, check_option2, option = "Visita a cenários internos ou externos onde foram filmadas"),
+         "Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas" = sapply(X, check_option2, option = "Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas"),
+         "Participação em eventos relacionados a filmes" = sapply(X, check_option2, option = "Participação em eventos relacionados a filmes"),
+         "Visita a estabelecimentos exibidos na tela, como bares, restaurantes e outros" = sapply(X, check_option2, option = "Visita a estabelecimentos exibidos na tela, como bares, restaurantes e outros"),
+         "Realização de roteiros guiados em locais de filmagem" = sapply(X, check_option2, option = "Realização de roteiros guiados em locais de filmagem"),
+         "Outra atividade" = sapply(X, check_option2, option = "Outros"),
+         "Visita a patrimônios culturais exibidos na tela" = sapply(X, check_option2, option = "Visita a patrimônios culturais exibidos na tela"))
+
+
 #removendo a coluna que dava todos dados juntos
-banco_principais <- subset(banco_principais, select = -X)
-```
+banco <- subset(banco, select = -X)
 
-```{r, echo = FALSE, include = FALSE}
-names(banco_principais)[13] <- 'X'
-
-check_option <- function(string, option) {
-  options <- strsplit(gsub("\\., ", "--",string), "--")[[1]]
-  if (option %in% options) {
-    return(as.factor('1'))
-  } else {
-    return(as.factor('0'))
-  }
-}
+names(banco)[14] <- 'X' # 18. Quais sentimentos foram despertados em você ao viver essa experiência turística e cinematográfica de lazer?
 
 # Apply the function to each row and create new columns
 
-banco_principais <- banco_principais %>% 
-  mutate("Visita a parques, praças e espaços na natureza exibidos na tela" = sapply(X, check_option, option = "Visita a parques, praças e espaços na natureza exibidos na tela"),
-         "Visita a Parques temáticos baseados em atrações inspiradas em séries, filmes, etc" = sapply(X, check_option, option = "Visita a Parques temáticos baseados em atrações inspiradas em séries, filmes, etc"),
-         "Visita a cenários internos ou externos onde foram filmadas" = sapply(X, check_option, option = "Visita a cenários internos ou externos onde foram filmadas"),
-         "Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas" = sapply(X, check_option, option = "Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas"),
-         "Participação em eventos relacionados a filmes" = sapply(X, check_option, option = "Participação em eventos relacionados a filmes"),
-         "Visita a estabelecimentos exibidos na tela, como bares, restaurantes e outros" = sapply(X, check_option, option = "Visita a estabelecimentos exibidos na tela, como bares, restaurantes e outros"),
-         "Realização de roteiros guiados em locais de filmagem" = sapply(X, check_option, option = "Realização de roteiros guiados em locais de filmagem"),
-         "Outra atividade" = sapply(X, check_option, option = "Outros"),
-         "Visita a patrimônios culturais exibidos na tela" = sapply(X, check_option, option = "Visita a patrimônios culturais exibidos na tela"))
+banco <- banco %>% 
+  mutate(Nostalgia = sapply(X, check_option1, option = "Nostalgia"),
+         Autorrealização = sapply(X, check_option1, option = "Autorrealização"),
+         "Escapismo da realidade" = sapply(X, check_option1, option = "Escapismo da realidade"),
+         Fantasia = sapply(X, check_option1, option = "Fantasia"),
+         Encantamento = sapply(X, check_option1, option = "Encantamento"),
+         Romance = sapply(X, check_option1, option = "Romance"),
+         "Superação de desafios" = sapply(X, check_option1, option = "Superação de desafios"),
+         "Outro sentimento" = sapply(X, check_option1, option = "Outros"))
 
 #removendo a coluna que dava todos dados juntos
-banco_principais <- subset(banco_principais, select = -X)
+banco <- subset(banco, select = -X)
+
 ```
+
 
 ```{r, echo = FALSE, include = FALSE}
-names(banco_principais)[13] <- 'X'
+#Organizando o nome das variaveis do banco
 
-#a <- strsplit(banco_principais$X,", ")
-#unique(unlist(a))
+# names(banco)
 
-check_option <- function(string, option) {
-  options <- strsplit(gsub("\\., ", "--",string), "--")[[1]]
-  if (option %in% options) {
-    return(as.factor('1'))
-  } else {
-    return(as.factor('0'))
-  }
+banco <- banco[,c(-3,-6,-9,-11,-13,-16)] # retirei do banco variáveis de resposta livre
+# retirei também pergunta 15 (é a mesma coisa da pergunta 16) e pegunta 22 (é a mesma coisa da pergunta 24)
+
+
+names(banco)[1:12] <- c('Sexo','Idade','Escolaridade',"Região residência", 'Frequência audiovisuais','Assinatura streaming','Grupo','Motivação',"Percepção",'Companhia', 'Experiência', 'Realizar outra viagem pelo audiovisual')
+
+#Organizando os tipos de variaveis do banco
+
+bancofator <- banco
+
+for (i in 1:length(names(bancofator))) {
+  bancofator[,i] <- as.factor(bancofator[,i])
 }
 
-# Apply the function to each row and create new columns
-
-banco_principais <- banco_principais %>% 
-  mutate(Nostalgia = sapply(X, check_option, option = "Nostalgia"),
-         Autorrealização = sapply(X, check_option, option = "Autorrealização"),
-         "Escapismo da realidade" = sapply(X, check_option, option = "Escapismo da realidade"),
-         Fantasia = sapply(X, check_option, option = "Fantasia"),
-         Encantamento = sapply(X, check_option, option = "Encantamento"),
-         Romance = sapply(X, check_option, option = "Romance"),
-         "Superação de desafios" = sapply(X, check_option, option = "Superação de desafios"),
-         "Outro sentimento" = sapply(X, check_option, option = "Outros"))
-
-#removendo a coluna que dava todos dados juntos
-banco_principais <- subset(banco_principais, select = -X)
-```
-
-```{r}
-# banco_principais[14] é "21. Com quem você viajou?"
-
-# unique(banco_principais[14])
-
-for (i in 1:117) {
-  if(banco_principais[i,14] %in% c("Colegas","Ex namorado","Amigos e namorado.","Marido e outros familiares", "Sozinha ou com amigos e/ou familiares")){
-    banco_principais[i,14] = 'Outros'
-  }
-}
-
+# str(bancofator)
 
 ```
 
 
-### Gráfico: Tipo de turista
-```{r}
+```{r, echo = FALSE, include = FALSE}
+
+ordem_original <- names(bancofator)[1:12]
+
+#Result guarda tabela resumo das perguntas cuja resposta é marcar um oval
+result <- bancofator %>%
+  pivot_longer(cols = 1:12, names_to = "Variável") %>%
+  count(Variável, value = value) %>%
+  rename(Quantidade = n,
+         Nível = value) %>% 
+  mutate(Percentual= percent(Quantidade/117,1)) %>% 
+  na.omit() %>% 
+  mutate(Variável = factor(Variável, levels = ordem_original)) %>%
+  arrange(Variável)
+
+
+ordem_original2 <- names(bancofator)[13:43]
+
+#Result2 guarda resumo das perguntas cuja resposta é marcar mais de um oval
+result2 <- bancofator %>%
+  pivot_longer(cols = 13:43, names_to = "Variável") %>%
+  count(Variável, value = value) %>%
+  rename(Quantidade = n,
+         Nível = value) %>% 
+  mutate(Percentual= percent(Quantidade/117,1)) %>% 
+  na.omit() %>% 
+  filter(Nível != 0) %>% 
+  mutate(Variável = factor(Variável, levels = ordem_original2)) %>%
+  arrange(Variável)
+
+#Esses "result's" servirão para fazermos os gráficos mais facilmente
+
+```
+
+
+### Gráfico: Turistas classificados segundo o grupo
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 banco %>% 
-  group_by(`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`) %>% 
+  group_by(Grupo) %>% 
   summarise(Quantidade=n()) %>% 
   mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
-  ggplot(aes(x=`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`, y=Quantidade, 
+  ggplot(aes(x=Grupo, y=Quantidade, 
            label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
   geom_label(position = position_dodge(width = 1), show.legend = F, ) +
-  theme(plot.title=element_text(hjust = 0.5, size=11, face = "bold")) + 
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
   theme(legend.title = element_text(size = 10))
 ```
 
-### Gráfico: Consumo de produção audiovisual
-```{r}
-dado <- strsplit(banco$`7. Quais os tipos de produção audiovisual você mais gosta de assistir? Se necessário, marque mais de uma opção.`, ",")
+### Gráfico: Sexo por grupo
 
-dado <- str_trim(unlist(dado))
-
-coluna <- unique(dado)
-data <- data.frame(matrix(nrow = 1, ncol = 5))
-colnames(data) = coluna
-
-data <- data %>%
-  mutate(Filmes = sum(dado == "Filmes")) %>% 
-  mutate(Novelas = sum(dado == "Novelas")) %>% 
-  mutate(Seriados = sum(dado == "Seriados")) %>% 
-  mutate('Clipes de música' = sum(dado == "Clipes de música")) %>% 
-  mutate(Outros = sum(dado == "Outros"))
-
-data <- melt(data)
-
-data %>% 
-  mutate(Percentual = percent(value/sum(value),1)) %>% 
-  ggplot(aes(x=reorder(variable, -value), y=value, label = Percentual)) + 
-  geom_bar(stat = "identity", position = "dodge", fill ='#9cd1f0') +
-  geom_label(position = position_dodge(width = 1), show.legend = F) +
-  theme_light() +
-  theme(axis.title.y = element_blank()) + 
-  theme(axis.title.x = element_blank()) +
-  theme(legend.title = element_text(size = 10))
-
-```
-
-Entre os que citaram "Outros", descreveram: documentários, curtas, propagandas criativas, produtores de conteúdo nas redes sociais.
-
-### Gráfico: - Faixa etária dos respondentes
-```{r}
-banco %>% 
-  group_by(`2. Faixa etária:`) %>% 
-  summarise(Quantidade=n()) %>% 
-  mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>% 
-  ggplot(aes(x=`2. Faixa etária:`, y=Quantidade, label = Percentual)) + 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+grafico1 <- result[1:2,] %>% 
+  ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
-  scale_y_continuous(breaks = seq(0,100,5)) +
+  scale_y_continuous(breaks = seq(0,100,10)) +
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
   theme(legend.title = element_text(size = 10))
 
+grafico2 <- banco %>% 
+  group_by(Grupo, Sexo) %>%
+  summarise(Quantidade=n()) %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  ggplot(aes(x=Grupo, y=Quantidade, 
+           fill=Sexo, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, ) +
+  scale_fill_manual(name="Sexo dos turistas", values=c('#9cd1f0','#368196')) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) 
+
+
+plot_grid(grafico1, grafico2, ncol = 2)
+chisq.test(banco$Grupo, banco$Sexo)
 
 ```
 
-### Gráfico: Nível de escolaridade dos respondentes
-```{r}
-banco %>% 
-  group_by(`4. Nível de escolaridade concluído:`) %>% 
-  summarise(Quantidade=n()) %>% 
-  mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>% 
-  ggplot(aes(x=`4. Nível de escolaridade concluído:`, y=Quantidade, label = Percentual)) + 
+### Gráfico: Faixa etária por grupo
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+grafico1 <- result[3:9,] %>% 
+  ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
-  scale_y_continuous(breaks = seq(0,55,5)) +
+  scale_y_continuous(breaks = seq(0,100,10)) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) + 
+  theme(axis.text.x = element_text(angle = -20, vjust = 0.5, hjust=0.5))
+
+grafico2 <- banco %>% 
+  group_by(Grupo, Idade) %>%
+  summarise(Quantidade=n()) %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  ggplot(aes(x=Grupo, y=Quantidade, 
+           fill=Idade, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_fill_manual(name="Faixa etária", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0", "#708142")) + 
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10))
+
+plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
+chisq.test(banco$Grupo, banco$Idade)
+
+```
+
+
+### Gráfico: Escolaridade por grupo
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+grafico1 <- result[10:13,] %>% 
+  na.omit() %>% 
+  ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_y_continuous(breaks = seq(0,100,10)) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) 
+
+grafico2 <- banco %>% 
+  group_by(Grupo, Escolaridade) %>%
+  summarise(Quantidade=n()) %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x=Grupo, y=Quantidade, 
+           fill=Escolaridade, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_fill_manual(name="Escolaridade", values=c('#368142','#368196',"#69b3a2", "#69b3e2")) + 
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10))
+
+plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
+chisq.test(banco$Grupo, banco$Escolaridade)
+
+```
+
+
+### Gráfico: Região de residência por grupo
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+grafico1 <- result[14:19,] %>% 
+  na.omit() %>% 
+  ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_y_continuous(breaks = seq(0,100,10)) +
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
   theme(legend.title = element_text(size = 10)) +
-  theme(axis.text.x = element_text(angle = -20, vjust = 0.5, hjust=0.5))
+  theme(axis.text.x = element_text(angle = -10, vjust = 0.5, hjust=0.5))
+
+grafico2 <- banco %>% 
+  group_by(Grupo,`Região residência` ) %>%
+  summarise(Quantidade=n()) %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x=Grupo, y=Quantidade, 
+           fill=`Região residência`, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_fill_manual(name="Região residência", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0")) + 
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) 
+
+plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
+chisq.test(banco$Grupo, banco$`Região residência`)
+
 ```
 
+### Gráfico: Frequência de consumo audiovisual por grupo
 
-### Gráfico: Região do Brasil onde os respondentes residem
-```{r}
-banco %>% 
-  group_by(`5. Em qual região do Brasil você reside atualmente?`) %>% 
-  summarise(Quantidade=n()) %>% 
-  mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>% 
-  ggplot(aes(x=`5. Em qual região do Brasil você reside atualmente?`, y=Quantidade, label = Percentual)) + 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+grafico1 <- result[20:24,] %>% 
+  na.omit() %>% 
+  ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
-  scale_y_continuous(breaks = seq(0,55,5)) +
+  scale_y_continuous(breaks = seq(0,100,10)) +
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
   theme(legend.title = element_text(size = 10)) +
-  theme(axis.text.x = element_text(angle = -20, vjust = 0.5, hjust=0.5))
-```
+  theme(axis.text.x = element_text(angle = -10, vjust = 0.5, hjust=0.5))
 
-
-### Gráfico: Respondente assina alguma plataforma de streaming
-```{r}
-banco %>% 
-  group_by(`9. Você assina alguma plataforma de streaming como Netflix, Amazon Prime, Globo Play, etc.?`) %>% 
+grafico2 <- banco %>% 
+  group_by(Grupo, `Frequência audiovisuais`) %>%
   summarise(Quantidade=n()) %>% 
-  mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>% 
-  na.omit(df) %>% 
-  ggplot(aes(x=`9. Você assina alguma plataforma de streaming como Netflix, Amazon Prime, Globo Play, etc.?`, y=Quantidade, label = Percentual)) + 
-  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
-  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
-  scale_y_continuous(breaks = seq(0,115,10)) +
-  theme_light() +
-  theme(axis.title.y = element_blank()) + 
-  theme(axis.title.x = element_blank()) +
-  theme(legend.title = element_text(size = 10))
-```
-
-Plataforma de streaming: Netflix, Amazon Prime, Globo Play, etc.
-
-
-### Gráfico: Os locais retratados na produção audiovisual estavam de acordo com o local visitado
-```{r}
-banco %>% 
-  group_by(`19. Na sua percepção, os locais retratados na produção audiovisual estavam de acordo com o que você presenciou no local visitado?`) %>% 
-  summarise(Quantidade=n()) %>% 
-  mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
   na.omit() %>% 
-  ggplot(aes(x=`19. Na sua percepção, os locais retratados na produção audiovisual estavam de acordo com o que você presenciou no local visitado?`, y=Quantidade, label = Percentual)) + 
-  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
+  ggplot(aes(x=Grupo, y=Quantidade, 
+           fill=`Frequência audiovisuais`, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge") +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
-  scale_y_continuous(breaks = seq(0,115,10)) +
+  scale_fill_manual(name="Frequência audiovisuais", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0")) + 
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
-  theme(legend.title = element_text(size = 10))
+  theme(legend.title = element_text(size = 10)) 
+
+plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
+chisq.test(banco$Grupo, banco$`Frequência audiovisuais`)
+
 ```
 
 
-### Gráfico: Nível de satisfação com a viagem induzida pelo audiovisual
-```{r}
-banco %>% 
-  group_by(`22. Como você classificaria o seu nível de satisfação com a sua viagem induzida pelo audiovisual:`) %>% 
-  summarise(Quantidade=n()) %>% 
-  mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>% 
-  ggplot(aes(x=reorder(`22. Como você classificaria o seu nível de satisfação com a sua viagem induzida pelo audiovisual:`, -Quantidade), y=Quantidade, label = Percentual)) + 
-  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
-  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
-  scale_y_continuous(breaks = seq(0,115,10)) +
-  theme_light() +
-  theme(axis.title.y = element_blank()) + 
-  theme(axis.title.x = element_blank()) +
-  theme(legend.title = element_text(size = 10))
-```
+### Gráfico: Assinatura streaming por grupo
 
-### Gráfico: Plataforma de streaming utilizada
-
-```{r}
-dado <- strsplit(banco$`10. Qual? Se necessário, marque mais de uma opção.`, ",")
-
-dado <- str_trim(unlist(dado)) %>% 
-  na.omit()
-
-coluna <- unique(dado)
-data <- data.frame(matrix(nrow = 1, ncol = 9))
-colnames(data) = coluna
-
-data <- data %>%
-  mutate(Netflix = sum(dado == "Netflix")) %>% 
-  mutate(Globoplay = sum(dado == "Globoplay")) %>% 
-  mutate('Disney+' = sum(dado == "Disney+")) %>% 
-  mutate('HBO Max' = sum(dado == "HBO Max")) %>% 
-  mutate(Telecine = sum(dado == "Telecine")) %>% 
-  mutate('Amazon Prime Vídeo' = sum(dado == "Amazon Prime Vídeo")) %>% 
-  mutate('Star+' = sum(dado == 'Star+')) %>% 
-  mutate(Outros = sum(dado == "Outros")) %>% 
-  mutate(Viki = sum(dado == "Viki"))
-
-data <- melt(data)
-
-data %>% 
-  mutate(Percentual = percent(value/sum(value),1)) %>% 
-  ggplot(aes(x=reorder(variable, -value), y=value, label = Percentual)) + 
-  geom_bar(stat = "identity", position = "dodge", fill ='#9cd1f0') +
-  geom_label(position = position_dodge(width = 1), show.legend = F) +
-  theme_light() +
-  theme(axis.title.y = element_blank()) + 
-  theme(axis.title.x = element_blank()) +
-  theme(legend.title = element_text(size = 10))
-```
-
-Entre os que citaram "Outros", descreveram: Pluto TV, Apple TV, Hulu, My Família TV.
-
-```{r}
-banco %>% 
-  group_by(`14. Qual foi a sua principal motivação para realizar essa viagem relacionada com o audiovisual?`) %>% 
-  summarise(Quantidade=n()) %>% 
-  mutate(Percentual = percent(Quantidade/sum(Quantidade),0)) %>%
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+grafico1 <- result[25:26,] %>% 
   na.omit() %>% 
-  ggplot(aes(x=reorder(`14. Qual foi a sua principal motivação para realizar essa viagem relacionada com o audiovisual?`, -Quantidade), y=Quantidade, label = Percentual, fill = reorder(`14. Qual foi a sua principal motivação para realizar essa viagem relacionada com o audiovisual?`, -Quantidade))) + 
+  ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_y_continuous(breaks = seq(0,100,10)) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) 
+
+grafico2 <- banco %>% 
+  group_by(Grupo, `Assinatura streaming`) %>%
+  summarise(Quantidade=n()) %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x=Grupo, y=Quantidade, 
+           fill=`Assinatura streaming`, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_fill_manual(name="Assinatura streaming", values=c('#368196',"#9cd1f0")) + 
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) 
+
+plot_grid(grafico1, grafico2, ncol = 2, rel_widths = c(0.8, 1.2))
+chisq.test(banco$Grupo, banco$`Assinatura streaming`)
+
+```
+
+
+### Gráfico: Motivação da viagem por grupo
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+grafico1 <- result[29:32,] %>% 
+  na.omit() %>% 
+  ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual, fill = reorder(Nível, -Quantidade))) + 
   geom_bar(stat = "identity") +
   scale_fill_manual(name="Motivação da viagem", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2")) +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
@@ -475,60 +538,377 @@ banco %>%
   theme(legend.title = element_text(size = 10)) +
   theme(legend.position = c(0.6, 0.75))
 
+grafico2 <- banco %>% 
+  group_by(Grupo, Motivação) %>%
+  summarise(Quantidade=n()) %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x=Grupo, y=Quantidade, 
+           fill=Motivação, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_fill_manual(name="Motivação", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0")) + 
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) +
+  theme(legend.position = c(0.6, 0.75))
+
+plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
+chisq.test(banco$Grupo, banco$Motivação)
+
 ```
 
 
+### Gráfico: Locais visitados estavam de acordo com os retratados em produção audiovisual por grupo
 
-### Gráfico: Sexo versus Tipo de turista
-```{r}
-banco %>% 
-  group_by(`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`, 
-           `1. Qual foi o sexo atribuído no seu nascimento?`) %>% 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+grafico1 <- result[33:35,] %>% 
+  na.omit() %>% 
+  ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_y_continuous(breaks = seq(0,100,10)) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) 
+
+grafico2 <- banco %>% 
+  group_by(Grupo, Percepção) %>%
   summarise(Quantidade=n()) %>% 
-  group_by(`1. Qual foi o sexo atribuído no seu nascimento?`) %>% 
+  group_by(Grupo) %>% 
   mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
-  ggplot(aes(x=`1. Qual foi o sexo atribuído no seu nascimento?`, y=Percentual, 
-           fill=`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`,
-           label = Percentual)) + 
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_fill_manual(name="Tipo turista", values=c('#9cd1f0','#368196',"#69b3a2")) +
-  geom_label(position = position_dodge(width = 1), show.legend = F) +
+  na.omit() %>% 
+  ggplot(aes(x=Grupo, y=Quantidade, 
+           fill=Percepção, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_fill_manual(name="Percepção", values=c('#368196',"#9cd1f0","#69b3a2")) + 
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) 
+
+plot_grid(grafico1, grafico2, ncol = 2, rel_widths = c(0.8, 1.2))
+chisq.test(banco$Grupo, banco$Percepção)
+
+```
+
+### Gráfico: Companhia da viagem por grupo
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+grafico1 <- result[36:41,] %>% 
+  na.omit() %>% 
+  ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual, fill = reorder(Nível, -Quantidade))) + 
+  geom_bar(stat = "identity") + 
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_fill_manual(name="Companhia", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0")) +
+  scale_y_continuous(breaks = seq(0,100,10)) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.text.x = element_blank()) +
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10))
+
+grafico2 <- banco %>% 
+  group_by(Grupo, Companhia) %>%
+  summarise(Quantidade=n()) %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x=Grupo, y=Quantidade, 
+           fill=Companhia, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_fill_manual(name="Companhia", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0")) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) 
+
+
+plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
+chisq.test(banco$Grupo, banco$Companhia)
+
+```
+
+
+### Gráfico: Expectativas da viagem atendidas por grupo
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+grafico1 <- result[42:45,] %>% 
+  na.omit() %>% 
+  ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual, fill = reorder(Nível, -Quantidade))) + 
+  geom_bar(stat = "identity") + 
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_fill_manual(name="Companhia", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0")) +
+  scale_y_continuous(breaks = seq(0,100,10)) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.text.x = element_blank()) +
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10))
+
+grafico2 <- banco %>% 
+  group_by(Grupo, Experiência) %>%
+  summarise(Quantidade=n()) %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x=Grupo, y=Quantidade, 
+           fill=Experiência, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_fill_manual(name="Expectativa da viagem atendida", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0")) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) 
+
+
+plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
+chisq.test(banco$Grupo, banco$Experiência)
+
+```
+
+
+### Gráfico: Realizar outra viagem pelo audiovisual por grupo
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+grafico1 <- result[46:47,] %>% 
+  ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_y_continuous(breaks = seq(0,100,20)) +
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
   theme(legend.title = element_text(size = 10))
-```
 
-### Gráfico: Sexo versus Tipo de turista
-
-```{r}
-banco %>% 
-  group_by(`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`, 
-           `1. Qual foi o sexo atribuído no seu nascimento?`) %>% 
+grafico2 <- banco %>% 
+  group_by(Grupo, `Realizar outra viagem pelo audiovisual`) %>%
   summarise(Quantidade=n()) %>% 
-  group_by(`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`) %>% 
+  group_by(Grupo) %>% 
   mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
-  ggplot(aes(x=`12. A experiência turística e/ou cinematográfica vivida neste destino foi:`, y=Percentual, 
-           fill=`1. Qual foi o sexo atribuído no seu nascimento?`, label = Percentual)) + 
+  na.omit() %>% 
+  ggplot(aes(x=Grupo, y=Quantidade, 
+           fill=`Realizar outra viagem pelo audiovisual`, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge") +
   geom_label(position = position_dodge(width = 1), show.legend = F, ) +
-  scale_fill_manual(name="Tipo turista", values=c('#9cd1f0','#368196',"#69b3a2")) +
-  theme(plot.title=element_text(hjust = 0.5, size=11, face = "bold")) + 
+  scale_fill_manual(name="Realizar outra viagem pelo audiovisual", values=c('#9cd1f0','#368196')) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) 
+
+
+plot_grid(grafico1, grafico2, ncol = 1)
+chisq.test(banco$Grupo, banco$`Realizar outra viagem pelo audiovisual`)
+```
+
+### Gráfico: Consumo de produção audiovisual
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+result2[1:5,] %>% 
+  ggplot(aes(x=reorder(Variável, -Quantidade), y=Quantidade, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_y_continuous(breaks = seq(0,100,10)) +
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
   theme(legend.title = element_text(size = 10))
 ```
 
-
-
-
+Entre os que citaram "Outro audiovisual", descreveram: documentários, curtas, propagandas criativas, produtores de conteúdo nas redes sociais.
 
 
 ```{r, echo = FALSE, include = FALSE}
-names(banco_principais) <- c('Sexo', 'Idade', 'Profissao', 'Escolaridade', 'Regiao_residencia',
-                             'Cidade', 'Frequencia_audiovisuais', 'Streaming', 'Destino_viagem',
-                             'Experiencia', 'Producao', 'Motivacao', 'Finalidade', 'Lazer',
-                             'Sentimentos', 'Fidedigno', 'Companhia', 'Satisfacao', 'Expectativas',
-                             'Repetiria',"Filmes", "Novelas", "Seriados", "Clipes_de_musica")
+data <- banco[,c(7,13:17)]
+n <- length(names(data))
+
+nome <- names(data)
+
+lista <- list()
+
+for (i in 1:(n-1)) {
+  data[,i+1] <- as.factor(data[,i+1])
+  resumo <- data %>% 
+    group_by(data[1], data[1+i]) %>% 
+    summarise(Quantidade=n())
+  lista[[i]] <- resumo
+}
+
+
+graficos1 <- lista[[1]] %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x=Grupo, y=Percentual, label = Percentual, fill = Filmes)) + 
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F) +
+  scale_fill_manual(name="Filmes", values=c('#9cd1f0',"#69b3a2"), 
+                    labels = c("1" = "Sim", "0" = "Não")) +
+  theme_light() + 
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) + 
+  theme(legend.title = element_text(size = 10)) 
+
+
+graficos2 <- lista[[2]] %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x=Grupo, y=Percentual, label = Percentual, fill = Novelas)) + 
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F) +
+  scale_fill_manual(name="Novelas", values=c('#9cd1f0',"#69b3a2"), 
+                    labels = c("1" = "Sim", "0" = "Não")) +
+  theme_light() + 
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) + 
+  theme(legend.title = element_text(size = 10)) 
+
+
+graficos3 <- lista[[3]] %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x=Grupo, y=Percentual, label = Percentual, fill = Seriados)) + 
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F) +
+  scale_fill_manual(name="Seriados", values=c('#9cd1f0',"#69b3a2"), 
+                    labels = c("1" = "Sim", "0" = "Não")) +
+  theme_light() + 
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) + 
+  theme(legend.title = element_text(size = 10)) 
+
+
+graficos4<- lista[[4]] %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x=Grupo, y=Percentual, label = Percentual, fill = `Clipes de música`)) + 
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F) +
+  scale_fill_manual(name="Clipes de música", values=c('#9cd1f0',"#69b3a2"), 
+                    labels = c("1" = "Sim", "0" = "Não")) +
+  theme_light() + 
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) + 
+  theme(legend.title = element_text(size = 10)) 
+
+
+graficos5 <- lista[[5]] %>% 
+  group_by(Grupo) %>% 
+  mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x=Grupo, y=Percentual, label = Percentual, fill = `Outro audiovisual`)) + 
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_label(position = position_dodge(width = 1), show.legend = F) +
+  scale_fill_manual(name="Outro audiovisual", values=c('#9cd1f0',"#69b3a2"), 
+                    labels = c("1" = "Sim", "0" = "Não")) +
+  theme_light() + 
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) + 
+  theme(legend.title = element_text(size = 10))
+```
+
+### Gráfico: Turistas que assistem filmes por grupo 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+graficos1
+chisq.test(data[,1], data[,2]) #Estão associadas
+```
+
+### Gráfico: Turistas que assistem novelas por grupo 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+graficos2
+chisq.test(data[,1], data[,3])
+```
+
+### Gráfico: Turistas que assistem seriados por grupo 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+graficos3
+chisq.test(data[,1], data[,4])
+```
+
+### Gráfico: Turistas que assistem clipes de música por grupo 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+graficos4
+chisq.test(data[,1], data[,5])
+```
+
+### Gráfico: Turistas que assistem outro produto audiovisual por grupo 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+graficos5
+chisq.test(data[,1], data[,6])
+```
+
+### Gráfico: Produção audiovisual consumida pelos turistas 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+result2[6:14,] %>% 
+  ggplot(aes(x=reorder(Variável, -Quantidade), y=Quantidade, label = Percentual)) + 
+  geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
+  geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
+  scale_y_continuous(breaks = seq(0,100,10)) +
+  theme_light() +
+  theme(axis.title.y = element_blank()) + 
+  theme(axis.title.x = element_blank()) +
+  theme(legend.title = element_text(size = 10)) +
+  theme(axis.text.x = element_text(angle = -10, vjust = 0.5, hjust=0.5))
+
+```
+
+Entre os que citaram "Outros streaming", descreveram: Pluto TV, Apple TV, Hulu, My Família TV.
+
+
+Precisa fazer a mesma coisa feita do result2 para as demais...
+
+
+
+
+
+
+# 4 Testes
+
+```{r, eval = FALSE, include = FALSE}
+#str(banco_principais)
+
+#chisq.test(banco_principais$Sexo, banco_principais$Grupo) #Nao relevante
+#chisq.test(banco_principais$Idade, banco_principais$Grupo) #Nao relevante
+#chisq.test(banco_principais$Escolaridade, banco_principais$Grupo) #Relevante
+#chisq.test(banco_principais$Regiao_residencia, banco_principais$Grupo) #Nao relevante
+#chisq.test(banco_principais$Frequencia_audiovisuais, banco_principais$Grupo) #Nao relevante
+#chisq.test(banco_principais$Streaming, banco_principais$Grupo) #Nao relevante
+#chisq.test(banco_principais$Finalidade, banco_principais$Grupo) #Nao relevante
+#chisq.test(banco_principais$Lazer, banco_principais$Grupo) #Nao relevante
+#chisq.test(banco_principais$Sentimentos, banco_principais$Grupo) #Nao relevante
+#chisq.test(banco_principais$Fidedigno, banco_principais$Grupo) #Relevante
+#chisq.test(banco_principais$Companhia, banco_principais$Grupo) #Nao relevante
+
+#str(banco_factors)
+
+for (i in 1:ncol(bancofator)){
+  print(paste(names(bancofator[i]) , chisq.test(bancofator[i], bancofator$Grupo)$p.value))
+}
+
+```
+
+# 5 Modelos rapidos para discussao
+```{r, eval = FALSE, include = FALSE}
+
+#utilizando as variaveis significativas no teste chi-quadrado alpha = 0.15
+
+#modelo1 <- glm(Grupo ~ Escolaridade + Sentimentos + Fidedigno + Satisfacao + NA.14, data = banco_factors, family = binomial)
+
+#summary(modelo1)
 ```
