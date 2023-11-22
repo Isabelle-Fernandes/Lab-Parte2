@@ -1513,7 +1513,7 @@ chisq.test(data[,1], data[,8])
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos8
-a <- chisq.test(data[,1], data[,9])
+chisq.test(data[,1], data[,9])
 ```
 
 
@@ -1582,13 +1582,56 @@ kable(tabela)
 
 ```
 
-# 4 Modelos rapidos para discussao
+# 4 - Modelo de regressão logistica
 
-```{r, eval = FALSE, include = FALSE}
+<div style="text-align: justify">
 
-#utilizando as variaveis significativas no teste chi-quadrado alpha = 0.15
+A análise de regressão é uma ferramenta estatística que nos permite explorar as relações entre variáveis, identificar fatores significativos e quantificar o impacto desses fatores em uma variável de interesse. Como temos uma variável de interesse com duas categorias, vamos utilizar uma regressão logistica.
 
-#modelo1 <- glm(Grupo ~ Escolaridade + Sentimentos + Fidedigno + Satisfacao + NA.14, data = banco_factors, family = binomial)
+Essa abordagem permite a compreensão de forma mais intuitiva como as variáveis explicativas estão relacionadas à variável de interesse.
 
-#summary(modelo1)
+<div/>
+
+```{r include=FALSE}
+# Modelo utilizando somente as variaveis com p-valor < 0.15 no teste qui-quadrado
+
+banco[] <- lapply(banco, factor)
+str(banco)
+modelo1 <- glm(banco$Grupo ~ banco$Filmes 
+               + banco$`Visita a parques, praças e espaços na natureza exibidos na tela` 
+               + banco$Experiência
+               + banco$`Visita a patrimônios culturais exibidos na tela`
+               , family = binomial(link = "logit"))
+
+summary(modelo1)
+
+#Modelo utilizando as variaveis com p-valor < 0.05 no teste qui-quadrado
+
+modelo2 <- glm(banco$Grupo ~ banco$Filmes 
+               + banco$`Visita a parques, praças e espaços na natureza exibidos na tela`
+               , family = binomial(link = "logit"))
+
+summary(modelo2)
 ```
+
+O modelo que se mostrou mais parcimonioso foi justamente aquele que utilizava as variáveis mais significativas no teste qui-quadrado para explicar o grupo dos individuos. Dessa forma o modelo final ficou como:
+
+```{r echo=FALSE}
+summary(modelo2)$call
+summary(modelo2)$coefficients[,c(1,4)]
+#summary(modelo2)$aic
+```
+
+Como desejado, todas as variáveis do modelo tem uma significância estatística e são relevantes para a interpretação do mesmo.
+
+```{r echo=FALSE}
+coef_modelo2 <- exp(coef(modelo2)[2:3])
+names(coef_modelo2) <- c("Filmes", "Visita")
+kable(coef_modelo2, caption = "Tabela dos coeficientes para interpretacao")
+```
+
+A interpretação dos coeficientes do modelo se da por:
+
+- Como exp(coeficiente) da variável "Filmes" é 7.94, isso implica que um 'Sim' em "Filmes" aumenta as chances do "Grupo" ser 'Especifica' em aproximandamente 8 vezes.
+- Como exp(coeficiente) da variável "Visita a parques..." é 4.35, isso implica que um 'Sim' aumenta as chances do "Grupo" ser 'Especifica' em aproximadamente 4 vezes.
+
