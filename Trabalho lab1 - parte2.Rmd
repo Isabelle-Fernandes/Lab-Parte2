@@ -8,6 +8,8 @@ output:
   pdf_document: default
 editor_options: 
   chunk_output_type: console
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -70,7 +72,8 @@ library(cowplot)
 
 <div style="text-align: justify">
 
-Compreender a motivação dos turistas para visitar determinada localidade influenciados pelo audiovisual.\
+Compreender a motivação dos turistas para visitar determinada localidade
+influenciados pelo audiovisual.\
 
 <div/>
 
@@ -766,7 +769,8 @@ result2[1:5,] %>%
   theme(legend.title = element_text(size = 10))
 ```
 
-Entre os que citaram "Outro audiovisual", descreveram: documentários, curtas, propagandas criativas, produtores de conteúdo nas redes sociais.
+Entre os que citaram "Outro audiovisual", descreveram: documentários,
+curtas, propagandas criativas, produtores de conteúdo nas redes sociais.
 
 ```{r, echo = FALSE, include = FALSE}
 data <- banco[,c(7,13:17)]
@@ -912,7 +916,8 @@ result2[6:14,] %>%
 
 ```
 
-Entre os que citaram "Outros streaming", descreveram: Pluto TV, Apple TV, Hulu, My Família TV.
+Entre os que citaram "Outros streaming", descreveram: Pluto TV, Apple
+TV, Hulu, My Família TV.
 
 ```{r, echo = FALSE, include = FALSE}
 data <- banco[,c(7,18:26)]
@@ -1374,7 +1379,8 @@ result2[24:30,] %>%
 
 ```
 
-Entre os que citaram "Outros streaming", descreveram: Pluto TV, Apple TV, Hulu, My Família TV.
+Entre os que citaram "Outros streaming", descreveram: Pluto TV, Apple
+TV, Hulu, My Família TV.
 
 ```{r, echo = FALSE, include = FALSE}
 data <- banco[,c(7,36:43)]
@@ -1590,13 +1596,16 @@ kable(tabela)
 
 **Teste qui-quadrado de independência**
 
-Esse teste é utilizado para verificar se existe associação entre as variáveis grupo com cada uma das outras variáveis qualitativas.
+Esse teste é utilizado para verificar se existe associação entre as
+variáveis grupo com cada uma das outras variáveis qualitativas.
 
 Hipóteses:
 
-$H_0$: As variáveis **grupo** com cada uma das outras variáveis são independentes
+$H_0$: As variáveis **grupo** com cada uma das outras variáveis são
+independentes
 
-$H_1$: As variáveis **grupo** com cada uma das outras variáveis são independentes estão associadas
+$H_1$: As variáveis **grupo** com cada uma das outras variáveis são
+independentes estão associadas
 
 ### Tabela resumo - teste qui-quadrado descritiva para cada variável
 
@@ -1630,25 +1639,29 @@ kable(tabela)
 
 <div style="text-align: justify">
 
-A análise de regressão é uma ferramenta estatística que nos permite explorar as relações entre variáveis, identificar fatores significativos e quantificar o impacto desses fatores em uma variável de interesse. Como temos uma variável de interesse com duas categorias, vamos utilizar uma regressão logistica.
+A análise de regressão é uma ferramenta estatística que nos permite
+explorar as relações entre variáveis, identificar fatores significativos
+e quantificar o impacto desses fatores em uma variável de interesse.
+Como temos uma variável de interesse com duas categorias, vamos utilizar
+uma regressão logistica.
 
-Essa abordagem permite a compreensão de forma mais intuitiva como as variáveis explicativas estão relacionadas à variável de interesse.
+Essa abordagem permite a compreensão de forma mais intuitiva como as
+variáveis explicativas estão relacionadas à variável de interesse.
 
 <div/>
 
 ```{r include=FALSE}
-# Modelo utilizando somente as variaveis com p-valor < 0.15 no teste qui-quadrado
-
 variaveis <- data.frame(banco$Grupo,
                         banco$Filmes,
                         banco$`Visita a parques, praças e espaços na natureza exibidos na tela`,
                         banco$Satisfação,
                         banco$`Visita a patrimônios culturais exibidos na tela`,
-                        banco$`Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`)
+                        banco$`Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`,
+                        banco$Idade)
 
 colnames(variaveis) <-   c("Grupo","Filmes","Visita a parques, praças e espaços na natureza exibidos na tela",
   "Satisfação", "Visita a patrimônios culturais exibidos na tela", 
-  "Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas")
+  "Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas", "Idade")
 
 
 for (i in 1:117) {
@@ -1663,58 +1676,95 @@ for (i in 1:117) {
 variaveis <- map_df(variaveis, as.factor)
 
 str(variaveis)
+```
+
+**Estimação do modelo de regrgessão logística**
+
+```{r include=FALSE}
+
+# Modelo utilizando somente as variaveis com p-valor < 0.15 no teste qui-quadrado
 
 
-M1 <- glm(Grupo ~ Filmes + `Visita a parques, praças e espaços na natureza exibidos na tela` + Satisfação + 
-                `Visita a patrimônios culturais exibidos na tela` + 
-        `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`, data = variaveis,
+M <- glm(Grupo ~ `Visita a parques, praças e espaços na natureza exibidos na tela` +
+            Filmes + Satisfação + `Visita a patrimônios culturais exibidos na tela` + 
+        `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas` +
+          Idade, data = variaveis,
+               family = binomial(link = "logit"))
+# summary(M)
+
+#Modelo retirando variável idade
+
+M <- glm(Grupo ~ `Visita a parques, praças e espaços na natureza exibidos na tela` +
+            Filmes + Satisfação + `Visita a patrimônios culturais exibidos na tela` + 
+        `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`,
+        data = variaveis,
                family = binomial(link = "logit"))
 
-#Modelo retirando variável não significativa
+#Modelo retirando variável idade e `Visita a patrimônios culturais exibidos na tela` 
 
-M2 <- glm(Grupo ~ Filmes + `Visita a parques, praças e espaços na natureza exibidos na tela` + Satisfação + 
-        `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`, data = variaveis,
+M1 <- glm(Grupo ~ `Visita a parques, praças e espaços na natureza exibidos na tela` +
+            Filmes + Satisfação + 
+        `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`,
+        data = variaveis,
                family = binomial(link = "logit"))
+# este modelo todas as variaveis deu significativa
+
 
 #Modelo utilizando as variaveis com p-valor < 0.05 no teste qui-quadrado
 
-M3 <- glm(Grupo ~ Filmes + `Visita a parques, praças e espaços na natureza exibidos na tela` +  
-        `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`, data = variaveis,
+M2 <- glm(Grupo ~`Visita a parques, praças e espaços na natureza exibidos na tela` +   Filmes + `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`, data = variaveis,
                family = binomial(link = "logit"))
-```
-
-**Análise de deviance**
-
-
-Foram estimados dois modelos:
-
-```{r echo=FALSE}
-
-summary(M2)$call
-
-summary(M3)$call
 
 ```
 
+<div style="text-align: justify">
+
+Foram estimados dois modelos que todos os coeficientes deram
+significativos. Utilizamos os Testes de de independência para nortear
+quais variáveis seriam colocadas a princípio no modelo.
+
+O modelo 1, como mostrado abaixo, a variável binária grupo é explicada
+pelas variáveis: - Visita a parques, praças e espaços na natureza
+exibidos na tela; - Filmes; - Satisfação; - Desfrute da gastronomia
+retratada na tela, incluindo alimentos e bebidas.
+
+O modelo 2, como mostrado abaixo, a variável binária grupo é explicada
+pelas variáveis: - Visita a parques, praças e espaços na natureza
+exibidos na tela; - Filmes; - Desfrute da gastronomia retratada na tela,
+incluindo alimentos e bebidas.
+
+É preciso saber se o modelo maior (modelo 1) é significativamente
+superior ao modelo menor (modelo 2), ou seja, se a varíavel "Satisfação"
+consegue melhorar na previsão de classificação do grupo. Caso a resposta
+seja não, optaremos pelo modelo 2 por ser mais parcimonioso.
+
+Para isso, será preciso realizar a análise do que é chamado em
+Estatística de modelos encaixados, a partir da deviance dos modelos.
+
+<div/>
+
+**Análise de modelos encaixados**
 
 ```{r echo=FALSE}
-anova(M3,M2, test="LR")
 
-M3$deviance
+kable(anova(M2,M1, test="LR")) 
 
-M2$deviance
-
-deltaDevi <- M3$deviance - M2$deviance # segue distribuição qui-quadrado com (M3$df.residual - M$df.residual) de liberdade
+deltaDevi <- M2$deviance - M1$deviance # segue distribuição qui-quadrado com (M3$df.residual - M$df.residual) de liberdade
 
 valorp <- 1-pchisq(deltaDevi, 1) # probabilidade de ser maior que a deltaDevi
+
+#As duas formas feitas acima, pela anova e calculando a estatística chega ao mesmo resultado
 ```
 
-
-A estatística $D_q$ (deviance do modelo com menos parâmetros) $D_p$ (deviance do modelo com mais parâmetros), onde q e p é número de parâmetros dos modelos, respectivamente, é útil como medida de variação dos dados explicada pelos termos que estão no modelo maior e não estão no modelo menor.
+A estatística $D_q$ (deviance do modelo com menos parâmetros) $D_p$
+(deviance do modelo com mais parâmetros), onde q e p é número de
+parâmetros dos modelos, respectivamente, é útil como medida de variação
+dos dados explicada pelos termos que estão no modelo maior e não estão
+no modelo menor.
 
 Assitoticamente, pode-se escrever:
 
-$\Delta D$ = $D_q$ - $D_p$ ~ $\mathbf{X}^{2}_{p-q}$
+$\Delta D$ = $D_q$ - $D_p$ \~ $\mathbf{X}^{2}_{p-q}$
 
 Hipóteses:
 
@@ -1722,120 +1772,173 @@ $H_0$: a diferença entre os modelos não é significativa
 
 $H_1$: a diferença entre os modelos é significativa
 
-Como o valor-p deu 0.014, rejeitamos a hipótese nula e ficamos com o modelo com mais parâmetros.
+Como o valor-p deu 0.014, rejeitamos a hipótese nula e ficamos com o
+modelo com mais parâmetros. Acredita-se que a variável "Satisfação"
+contribui para explicar a variabilidade dos dados.
 
-Vamos conferir se a deviance é moderada:
+**Análise de deviance**
 
-```{r echo=FALSE}
+```{r, eval = FALSE, include = FALSE}
+M1$deviance
+qchisq(0.95,112)
+```
 
+Agora, é preciso conferir se a deviance do modelo escolhido é moderada.
+Para decidir se uma deviance é pequena / moderada / grande, podemos usar
+como referência:
 
-qchisq(0.90, 1)
+-   o percentil $\mathbf{X}^{2}_{n-p}$, onde "n" é o tamanho da amostra (116) e "p" o número de parêmetros (4).
+
+Se P(D \> $\mathbf{X}^{2}_{n-p;\alpha}$) = \alpha; neste caso, 0 \< D \<
+$\mathbf{X}^{2}_{n-p;\alpha}$ indica deviance pequena ou moderada.
+
+O valor esperado $\mathbf{X}^{2}_{n-p;\alpha}$ que é igual (n - p);
+neste caso, uma deviance moderada estaria próxima de n − p.
+
+Para o modelo, D = 100.0668. A média da distribuição
+$\mathbf{X}^{2}_{12}$ é 112. D está próximo da média, logo podemos
+considerá-la moderada. Também, o percentil da distribuição
+$\mathbf{X}^{2}_{112}$ com \alpha = 0.05 é 137.7015. Como 0 \< 0 \<
+137.7015, o modelo possui deviance moderada.
+
+# Tabela - Regressores, coeficientes, Valor-p e $\mathbf{e}^{\eta}$
+
+```{r, echo = FALSE, include = FALSE}
+coeficiente <- coef(M1)
+
+names(coeficiente) <- c("Intercepto", "Filmes_Sim", "Visita a parques, praças e espaços na natureza exibidos na tela_Sim",
+                         "Satisfeito/ Indiferente/ Muito insatisfeito", "Desfrute da gastronomia retratada na tela_Sim")
+
+pvalor <- as.data.frame(summary(M1)$coef[, "Pr(>|z|)"])
+
+exp <- exp(coef(M1))
+
+coeficiente <- data.frame(coeficiente, round(pvalor,4), exp)
+
+colnames(coeficiente) <- c("Coeficiente", "Valor-p", "exp{beta}")
+
+kable(coeficiente)
 
 ```
 
-O modelo com menor AIC foi o modelo2
+**Análise de resíduos**
 
-```{r echo=FALSE}
+```{r, echo = FALSE, include = FALSE}
+CD = cooks.distance(M1)
+pontos_influente <- CD[CD > 4/116]
 
-summary(M2)$call
 
-summary(M2)$coefficients[,c(1,4)]
+plot_cooksd <- function(object){
 
-summary(M2)$aic
+  cooksd <- data.frame(
+    cooksd = stats::cooks.distance(object)
+  )
+  n <- length(object$residuals)
+  f <- 4/116 #critério  para calcular a distância de cook 4/n
+
+  ggplot(cooksd, aes(x = seq_along(.data$cooksd), y = .data$cooksd)) +
+    geom_point() +
+    geom_abline(intercept = f, slope = 0, color = "red", linetype="dashed") +
+    geom_segment(aes(x = seq_along(.data$cooksd), y = 0, xend = seq_along(.data$cooksd), yend = .data$cooksd)) +
+    ggtitle("Distância de Cook") +
+    labs(x="Observação") +
+    ylim(range(c(0, f, cooksd$cooksd))) +
+    theme(legend.position="none") +
+    theme_light() 
+}
+
+plot_cooksd(M1)
 ```
 
-Como desejado, todas as variáveis do modelo tem uma significância estatística e são relevantes para a interpretação do mesmo.
+Reajustaremos o modelo sem a observação 106 e será comparado se os coeficientes da regressão alteram muito.
 
-```{r echo=FALSE}
-coef_modelo2 <- exp(coef(M2)[2:5])
+# Tabela - Regressores, coeficientes, Valor-p e $\mathbf{e}^{\eta}$
 
-names(coef_modelo2) <- c("Filmes", "Visita a parques, praças e espaços na natureza exibidos na tela",
-                         "Satisfeito/ Indiferente/ Muito insatisfeito", "Desfrute da gastronomia retratada na tela")
+```{r, echo = FALSE, include = FALSE}
+variaveissem <- variaveis[-106,]
 
-kable(coef_modelo2, caption = "Tabela dos coeficientes para interpretacao")
+M3 <- glm(Grupo ~ `Visita a parques, praças e espaços na natureza exibidos na tela` +
+            Filmes + Satisfação + 
+        `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`,
+        data = variaveissem,
+               family = binomial(link = "logit"))
 
+coeficiente <- coef(M3)
 
+names(coeficiente) <- c("Intercepto", "Filmes_Sim", "Visita a parques, praças e espaços na natureza exibidos na tela_Sim",
+                         "Satisfeito/ Indiferente/ Muito insatisfeito", "Desfrute da gastronomia retratada na tela_Sim")
+
+pvalor <- as.data.frame(summary(M3)$coef[, "Pr(>|z|)"])
+
+exp <- exp(coef(M3))
+
+coeficiente <- data.frame(coeficiente, round(pvalor,4), exp)
+
+colnames(coeficiente) <- c("Coeficiente", "Valor-p", "exp{beta}")
+
+kable(coeficiente)
 ```
 
-```{r}
-eta = predict(M2) # preditor linear
+# Gráficos de resíduos contra os valores ajustados do modelo
+
+```{r, echo = FALSE, include = FALSE}
+
+eta = predict(M1) # preditor linear
 odds = exp(eta) # razão de chance
 ychapeu <- odds/(1+odds)
 
-Turista <- c(1:101,103:117) # o individuo 102 foi omitido no ajuste do modelo pois estava com NA, 
+
+# fit = ychapeu 
+
+rp = residuals(M1, type = "pearson") #residuo de pearson
+fit = fitted(M1)
+data <- data.frame(fit, rp)
+
+ggplot(
+  data, aes(x=fit, y=rp)) +
+  geom_point(size = 1) +
+  geom_hline(yintercept = 0, colour = "red") +
+  geom_smooth(method = "loess", se = FALSE, color = "blue", size = 0.6) +
+    labs(x = "Valores Ajustados", y = "Resíduos de Pearson") +
+  theme_light() 
+
+```
+
+A curva Lowess mostra proximidade ao patamar 0. Contudo, ela apresenta formato de parábola, o que indica a necessidade de ajustar o MLG logístico com efeito quadrático de alguma covariáavel. Contudo, como as variáveis são todas binárias, essa transformação não teria efeito. Assim, o modelo possível obtido é este.
+
+Por, abaixo o gráfico evidencia a probalidade de um indvpiduo ser classificado como pertencente ao grupo "específico", conforme o modelo prevê. Os valores reais do grupo são 27
+
+### Gráfico: "Probabilidade do turista ser classificado como Específico pelo modelo"
+
+```{r,eval=FALSE}
+
+turista <- c(1:101, 103:117)
+
+data.frame(turista, fit) %>% 
+  ggplot(aes(x=turista, y=fit)) +
+  geom_point(size=0.8) +
+  labs(y = "Probabilidade do turista ser Específico",
+       x="Observação") +
+  geom_hline(yintercept = 0.5, colour = "red", size=0.5) +
+  geom_point()
+  theme_light()
+  
+
+# sum(variaveis[c(1:101,103:116),1]==1)
+
+```
+
+
+
+```{r,eval=FALSE}
+
+
 
 posicao <- NULL #vetor posição dos individuos que tem o valor real "Específica" 
 
 for (i in 1:116) {
   if (variaveis[i,1]=="1") {
     posicao <- append(posicao, i)
-    
-  }
-}
-
-posicao2 <- NULL #vetor posição dos individuos que o modelo previu como "Específica"
-
-for (i in 1:116) {
-  if (ychapeu[i]>0.5) {
-    posicao2 <- append(posicao2, i)
-  }
-}
-```
-
-Turistas que tem o valor real Específica
-
-```{r}
-posicao
-
-```
-
-Turistas que o modelo classificou como Específica
-
-```{r}
-posicao2
-
-```
-
-### Gráfico: "Probabilidade do turista ser classificado como Específico pelo modelo"
-
-```{r,echo=FALSE}
-
-data.frame(Turista, ychapeu) %>% 
-  ggplot(aes(x=Turista, y=ychapeu)) +
-  geom_point() +
-  labs(y = "Probabilidade do turista ser Específico") +
-  geom_hline(yintercept = 0.5, colour = "red")
-
-```
-
-Análise de resíduo
-
-```{r,echo=FALSE}
-
-CD = cooks.distance(M2)
-pontos_influente <- CD[CD > 4/116]
-pontos_influente
-
-variaveis_sem_pontos_influentes <- variaveis[-106,] #retirando o ponto 106
-
-M4 <- glm(Grupo ~ Filmes + `Visita a parques, praças e espaços na natureza exibidos na tela` + Satisfação + 
-        `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`, data = variaveis_sem_pontos_influentes,
-        family = binomial(link = "logit"))
-
-summary(M4)
-
-eta = predict(M4) # preditor linear
-odds = exp(eta) # razão de chance
-ychapeu <- odds/(1+odds)
-
-Turista <- c(1:101,103:105,107:117) # o individuo 102 e 106 foi omitido no ajuste do modelo.
-
-posicao <- NULL #vetor posição dos individuos que tem o valor real "Específica" 
-
-for (i in 1:115) {
-  if (variaveis_sem_pontos_influentes[i,1]=="1") {
-    posicao <- append(posicao, i)
-    
   }
 }
 
