@@ -112,6 +112,7 @@ banco <- as.data.frame(banco[,c(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,2
 ```
 
 ```{r, echo = FALSE, include = FALSE}
+
 # banco[,12] é "12. A experiência turística e/ou cinematográfica vivida neste destino foi:"
 
 for (i in 1:117) {
@@ -120,6 +121,21 @@ for (i in 1:117) {
   }
 }
 
+# banco[,2] é "2. Faixa etária:"
+
+# unique(banco[2])
+
+for (i in 1:117) {
+  if(banco[i,2] %in% c("Mais de 60", "Entre 41 - 50", "Entre 51 - 60")){
+    banco[i,2] = 'Mais de 41'
+  }
+  if(banco[i,2] %in% c("Entre 18 - 20", "Entre 21 - 24", "Entre 25 - 30")){
+    banco[i,2] = 'Entre 18 - 30'
+  }
+}
+
+
+
 # banco[4] é "4. Nível de escolaridade concluído:"
 
 # unique(banco[4])
@@ -127,6 +143,25 @@ for (i in 1:117) {
 for (i in 1:117) {
   if(banco[i,4] %in% c("Pos doutoramento","Livre docente")){
     banco[i,4] = 'Doutorado'
+  }
+}
+
+for (i in 1:117) {
+  if(banco[i,4] %in% c("Pós-Graduação ou Mestrado","Doutorado")){
+    banco[i,4] = 'Ensino Médio'
+  }
+}
+
+# banco[8] é "8. Com que frequência você assiste a filmes, séries, telenovelas, clipes musicais ou outras produções audiovisuais?"
+
+# unique(banco[8])
+
+for (i in 1:117) {
+  if(banco[i,8] %in% c("Somente aos fins de semana","2 vezes por semana", "1 vez por semana")){
+    banco[i,8] = 'Poucas vezes por semana'
+  }
+  else{
+      banco[i,8] = 'Várias vezes por semana'
   }
 }
 
@@ -139,6 +174,18 @@ for (i in 1:117) {
     banco[i,19] = 'Outros'
   }
 }
+
+# banco[19] é "22. Como você classificaria o seu nível de satisfação com a sua viagem induzida pelo audiovisual:"
+
+# unique(banco[20])
+
+for (i in 1:117) {
+  if(banco[i,20] %in% c("Muito insatisfeito","Indiferente","Satisfeito")){
+    banco[i,20] = 'Satisfeito/ Indiferente/ Muito insatisfeito'
+  }
+}
+
+
 
 ```
 
@@ -242,11 +289,11 @@ banco <- subset(banco, select = -X)
 
 # names(banco)
 
-banco <- banco[,c(-3,-6,-9,-11,-13,-16)] # retirei do banco variáveis de resposta livre
-# retirei também pergunta 15 (é a mesma coisa da pergunta 16) e pegunta 22 (é a mesma coisa da pergunta 24)
+banco <- banco[,c(-3,-6,-9,-11,-13,-17)] # retirei do banco variáveis de resposta livre
+# retirei também pergunta 15 (é a mesma coisa da pergunta 16) e pegunta 24 (é a mesma coisa da pergunta 22)
 
 
-names(banco)[1:12] <- c('Sexo','Idade','Escolaridade',"Região residência", 'Frequência audiovisuais','Assinatura streaming','Grupo','Motivação',"Percepção",'Companhia', 'Experiência', 'Realizar outra viagem pelo audiovisual')
+names(banco)[1:12] <- c('Sexo','Idade','Escolaridade',"Região residência", 'Frequência audiovisuais','Assinatura streaming','Grupo','Motivação',"Percepção",'Companhia', 'Satisfação', 'Realizar outra viagem pelo audiovisual')
 
 #Organizando os tipos de variaveis do banco
 
@@ -348,7 +395,7 @@ chisq.test(banco$Grupo, banco$Sexo)
 ### Gráfico: Faixa etária por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-grafico1 <- result[3:9,] %>% 
+grafico1 <- result[3:5,] %>% 
   ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
@@ -356,8 +403,7 @@ grafico1 <- result[3:9,] %>%
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
-  theme(legend.title = element_text(size = 10)) + 
-  theme(axis.text.x = element_text(angle = -20, vjust = 0.5, hjust=0.5))
+  theme(legend.title = element_text(size = 10))
 
 grafico2 <- banco %>% 
   group_by(Grupo, Idade) %>%
@@ -368,7 +414,7 @@ grafico2 <- banco %>%
            fill=Idade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge") +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
-  scale_fill_manual(name="Faixa etária", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0", "#708142")) + 
+  scale_fill_manual(name="Faixa etária", values=c("#69b3e2",'#368196',"#69b3a2",'#368142', "#01d8a2","#9cd1f0", "#708142")) + 
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
@@ -382,7 +428,7 @@ chisq.test(banco$Grupo, banco$Idade)
 ### Gráfico: Escolaridade por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-grafico1 <- result[10:13,] %>% 
+grafico1 <- result[6:7,] %>% 
   na.omit() %>% 
   ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
@@ -417,7 +463,7 @@ chisq.test(banco$Grupo, banco$Escolaridade)
 ### Gráfico: Região de residência por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-grafico1 <- result[14:19,] %>% 
+grafico1 <- result[8:13,] %>% 
   na.omit() %>% 
   ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
@@ -448,12 +494,13 @@ grafico2 <- banco %>%
 plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
 chisq.test(banco$Grupo, banco$`Região residência`)
 
+
 ```
 
 ### Gráfico: Frequência de consumo audiovisual por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-grafico1 <- result[20:24,] %>% 
+grafico1 <- result[14:15,] %>% 
   na.omit() %>% 
   ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
@@ -462,8 +509,7 @@ grafico1 <- result[20:24,] %>%
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
-  theme(legend.title = element_text(size = 10)) +
-  theme(axis.text.x = element_text(angle = -10, vjust = 0.5, hjust=0.5))
+  theme(legend.title = element_text(size = 10))
 
 grafico2 <- banco %>% 
   group_by(Grupo, `Frequência audiovisuais`) %>%
@@ -475,7 +521,7 @@ grafico2 <- banco %>%
            fill=`Frequência audiovisuais`, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge") +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
-  scale_fill_manual(name="Frequência audiovisuais", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0")) + 
+  scale_fill_manual(name="Frequência audiovisuais", values=c("#69b3a2", "#69b3e2",'#368142','#368196', "#01d8a2","#9cd1f0")) + 
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
@@ -489,7 +535,7 @@ chisq.test(banco$Grupo, banco$`Frequência audiovisuais`)
 ### Gráfico: Assinatura streaming por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-grafico1 <- result[25:26,] %>% 
+grafico1 <- result[16:17,] %>% 
   na.omit() %>% 
   ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
@@ -516,7 +562,7 @@ grafico2 <- banco %>%
   theme(axis.title.x = element_blank()) +
   theme(legend.title = element_text(size = 10)) 
 
-plot_grid(grafico1, grafico2, ncol = 2, rel_widths = c(0.8, 1.2))
+plot_grid(grafico1, grafico2, ncol = 2, rel_widths = c(0.8, 1.8))
 chisq.test(banco$Grupo, banco$`Assinatura streaming`)
 
 ```
@@ -524,7 +570,7 @@ chisq.test(banco$Grupo, banco$`Assinatura streaming`)
 ### Gráfico: Motivação da viagem por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-grafico1 <- result[29:32,] %>% 
+grafico1 <- result[20:23,] %>% 
   na.omit() %>% 
   ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual, fill = reorder(Nível, -Quantidade))) + 
   geom_bar(stat = "identity") +
@@ -561,10 +607,11 @@ chisq.test(banco$Grupo, banco$Motivação)
 
 ```
 
+
 ### Gráfico: Locais visitados estavam de acordo com os retratados em produção audiovisual por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-grafico1 <- result[33:35,] %>% 
+grafico1 <- result[24:26,] %>% 
   na.omit() %>% 
   ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
@@ -599,7 +646,7 @@ chisq.test(banco$Grupo, banco$Percepção)
 ### Gráfico: Companhia da viagem por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-grafico1 <- result[36:41,] %>% 
+grafico1 <- result[27:32,] %>% 
   na.omit() %>% 
   ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual, fill = reorder(Nível, -Quantidade))) + 
   geom_bar(stat = "identity") + 
@@ -634,15 +681,15 @@ chisq.test(banco$Grupo, banco$Companhia)
 
 ```
 
-### Gráfico: Expectativas da viagem atendidas por grupo
+### Gráfico: Satisfação com viagem induzida pelo audiovisual por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-grafico1 <- result[42:45,] %>% 
+grafico1 <- result[33:34,] %>% 
   na.omit() %>% 
   ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual, fill = reorder(Nível, -Quantidade))) + 
   geom_bar(stat = "identity") + 
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
-  scale_fill_manual(name="Companhia", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0")) +
+  scale_fill_manual(name="Satisfação", values=c("#69b3a2", "#69b3e2",'#368142','#368196', "#01d8a2","#9cd1f0")) +
   scale_y_continuous(breaks = seq(0,100,10)) +
   theme_light() +
   theme(axis.title.y = element_blank()) + 
@@ -651,16 +698,16 @@ grafico1 <- result[42:45,] %>%
   theme(legend.title = element_text(size = 10))
 
 grafico2 <- banco %>% 
-  group_by(Grupo, Experiência) %>%
+  group_by(Grupo, Satisfação) %>%
   summarise(Quantidade=n()) %>% 
   group_by(Grupo) %>% 
   mutate(Percentual = percent(Quantidade/sum(Quantidade),1)) %>% 
   na.omit() %>% 
   ggplot(aes(x=Grupo, y=Quantidade, 
-           fill=Experiência, label = Percentual)) + 
+           fill=Satisfação, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge") +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
-  scale_fill_manual(name="Expectativa da viagem atendida", values=c('#368142','#368196',"#69b3a2", "#69b3e2", "#01d8a2","#9cd1f0")) +
+  scale_fill_manual(name="Satisfação com a viagem", values=c("#69b3a2", "#69b3e2",'#368142','#368196', "#01d8a2","#9cd1f0")) +
   theme_light() +
   theme(axis.title.y = element_blank()) + 
   theme(axis.title.x = element_blank()) +
@@ -668,14 +715,14 @@ grafico2 <- banco %>%
 
 
 plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
-chisq.test(banco$Grupo, banco$Experiência)
+chisq.test(banco$Grupo, banco$Satisfação)
 
 ```
 
 ### Gráfico: Realizar outra viagem pelo audiovisual por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-grafico1 <- result[46:47,] %>% 
+grafico1 <- result[35:36,] %>% 
   ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual)) + 
   geom_bar(stat = "identity",position = "dodge", fill="#9cd1f0") +
   geom_label(position = position_dodge(width = 1), show.legend = F, size=3) +
@@ -1513,7 +1560,7 @@ chisq.test(data[,1], data[,8])
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos8
-a <- chisq.test(data[,1], data[,9])
+chisq.test(data[,1], data[,9])
 ```
 
 
@@ -1582,13 +1629,72 @@ kable(tabela)
 
 ```
 
-# 4 Modelos rapidos para discussao
+# 4 - Modelo de regressão logistica
 
-```{r, eval = FALSE, include = FALSE}
+<div style="text-align: justify">
 
-#utilizando as variaveis significativas no teste chi-quadrado alpha = 0.15
+A análise de regressão é uma ferramenta estatística que nos permite explorar as relações entre variáveis, identificar fatores significativos e quantificar o impacto desses fatores em uma variável de interesse. Como temos uma variável de interesse com duas categorias, vamos utilizar uma regressão logistica.
 
-#modelo1 <- glm(Grupo ~ Escolaridade + Sentimentos + Fidedigno + Satisfacao + NA.14, data = banco_factors, family = binomial)
+Essa abordagem permite a compreensão de forma mais intuitiva como as variáveis explicativas estão relacionadas à variável de interesse.
 
-#summary(modelo1)
+<div/>
+
+```{r include=FALSE}
+# Modelo utilizando somente as variaveis com p-valor < 0.15 no teste qui-quadrado
+
+banco[] <- lapply(banco, factor)
+str(banco)
+
+
+modelo1 <- glm(banco$Grupo ~ banco$Filmes 
+               + banco$`Visita a parques, praças e espaços na natureza exibidos na tela` + banco$Satisfação + 
+                 banco$`Visita a patrimônios culturais exibidos na tela` + 
+                 banco$`Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`,
+               family = binomial(link = "logit"))
+
+summary(modelo1)
+
+#Modelo retirando variável não significativa
+
+modelo2 <- glm(banco$Grupo ~ banco$Filmes 
+               + banco$`Visita a parques, praças e espaços na natureza exibidos na tela` + banco$Satisfação + 
+                 banco$`Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`,
+               family = binomial(link = "logit"))
+
+summary(modelo2)
+
+#Modelo utilizando as variaveis com p-valor < 0.05 no teste qui-quadrado
+
+modelo3 <- glm(banco$Grupo ~ banco$Filmes 
+               + banco$`Visita a parques, praças e espaços na natureza exibidos na tela` + banco$Satisfação,
+               family = binomial(link = "logit"))
+
+summary(modelo3)
+
+
+
+
 ```
+
+O modelo com menor AIC foi o modelo2
+
+```{r echo=FALSE}
+
+summary(modelo2)$call
+
+summary(modelo2)$coefficients[,c(1,4)]
+
+summary(modelo2)$aic
+```
+
+Como desejado, todas as variáveis do modelo tem uma significância estatística e são relevantes para a interpretação do mesmo.
+
+```{r echo=FALSE}
+coef_modelo2 <- exp(coef(modelo2)[2:5])
+names(coef_modelo2) <- c("Filmes", "Visita a parques, praças e espaços na natureza exibidos na tela",
+                         "Satisfeito/ Indiferente/ Muito insatisfeito", "Desfrute da gastronomia retratada na tela")
+kable(coef_modelo2, caption = "Tabela dos coeficientes para interpretacao")
+
+
+```
+
