@@ -3,9 +3,9 @@ title: 'Relatório: 2ª Rodada Laboratório 1'
 author: "Joaquim e Isabelle"
 date: "19-11-2023"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 editor_options: 
   chunk_output_type: console
 ---
@@ -606,7 +606,6 @@ plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
 chisq.test(banco$Grupo, banco$Motivação)
 
 ```
-
 
 ### Gráfico: Locais visitados estavam de acordo com os retratados em produção audiovisual por grupo
 
@@ -1563,7 +1562,6 @@ graficos8
 chisq.test(data[,1], data[,9])
 ```
 
-
 ### Tabela resumo - estatística descritiva para cada variável
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -1590,16 +1588,15 @@ kable(tabela)
 
 ```
 
-
 **Teste qui-quadrado de independência**
 
-Esse teste é utilizado para verificar se existe associação entre as variáveis grupo com cada uma das outras variáveis qualitativas.  
-  
-Hipóteses:  
-  
-$H_0$: As variáveis **grupo** com cada uma das outras variáveis são independentes  
-  
-$H_1$: As variáveis **grupo** com cada uma das outras variáveis são independentes estão associadas  
+Esse teste é utilizado para verificar se existe associação entre as variáveis grupo com cada uma das outras variáveis qualitativas.
+
+Hipóteses:
+
+$H_0$: As variáveis **grupo** com cada uma das outras variáveis são independentes
+
+$H_1$: As variáveis **grupo** com cada uma das outras variáveis são independentes estão associadas
 
 ### Tabela resumo - teste qui-quadrado descritiva para cada variável
 
@@ -1642,37 +1639,97 @@ Essa abordagem permite a compreensão de forma mais intuitiva como as variáveis
 ```{r include=FALSE}
 # Modelo utilizando somente as variaveis com p-valor < 0.15 no teste qui-quadrado
 
-banco[] <- lapply(banco, factor)
-str(banco)
+variaveis <- data.frame(banco$Grupo,
+                        banco$Filmes,
+                        banco$`Visita a parques, praças e espaços na natureza exibidos na tela`,
+                        banco$Satisfação,
+                        banco$`Visita a patrimônios culturais exibidos na tela`,
+                        banco$`Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`)
+
+colnames(variaveis) <-   c("Grupo","Filmes","Visita a parques, praças e espaços na natureza exibidos na tela",
+  "Satisfação", "Visita a patrimônios culturais exibidos na tela", 
+  "Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas")
 
 
-modelo1 <- glm(banco$Grupo ~ banco$Filmes 
-               + banco$`Visita a parques, praças e espaços na natureza exibidos na tela` + banco$Satisfação + 
-                 banco$`Visita a patrimônios culturais exibidos na tela` + 
-                 banco$`Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`,
+for (i in 1:117) {
+  if(variaveis[i,1] == "Geral ou Casual"){
+    variaveis[i,1] = 0
+  } else {
+    variaveis[i,1] = 1
+  }
+}
+  
+
+variaveis <- map_df(variaveis, as.factor)
+
+str(variaveis)
+
+
+M1 <- glm(Grupo ~ Filmes + `Visita a parques, praças e espaços na natureza exibidos na tela` + Satisfação + 
+                `Visita a patrimônios culturais exibidos na tela` + 
+        `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`, data = variaveis,
                family = binomial(link = "logit"))
-
-summary(modelo1)
 
 #Modelo retirando variável não significativa
 
-modelo2 <- glm(banco$Grupo ~ banco$Filmes 
-               + banco$`Visita a parques, praças e espaços na natureza exibidos na tela` + banco$Satisfação + 
-                 banco$`Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`,
+M2 <- glm(Grupo ~ Filmes + `Visita a parques, praças e espaços na natureza exibidos na tela` + Satisfação + 
+        `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`, data = variaveis,
                family = binomial(link = "logit"))
-
-summary(modelo2)
 
 #Modelo utilizando as variaveis com p-valor < 0.05 no teste qui-quadrado
 
-modelo3 <- glm(banco$Grupo ~ banco$Filmes 
-               + banco$`Visita a parques, praças e espaços na natureza exibidos na tela` + banco$Satisfação,
+M3 <- glm(Grupo ~ Filmes + `Visita a parques, praças e espaços na natureza exibidos na tela` +  
+        `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`, data = variaveis,
                family = binomial(link = "logit"))
+```
 
-summary(modelo3)
+**Análise de deviance**
 
 
+Foram estimados dois modelos:
 
+```{r echo=FALSE}
+
+summary(M2)$call
+
+summary(M3)$call
+
+```
+
+
+```{r echo=FALSE}
+anova(M3,M2, test="LR")
+
+M3$deviance
+
+M2$deviance
+
+deltaDevi <- M3$deviance - M2$deviance # segue distribuição qui-quadrado com (M3$df.residual - M$df.residual) de liberdade
+
+valorp <- 1-pchisq(deltaDevi, 1) # probabilidade de ser maior que a deltaDevi
+```
+
+
+A estatística $D_q$ (deviance do modelo com menos parâmetros) $D_p$ (deviance do modelo com mais parâmetros), onde q e p é número de parâmetros dos modelos, respectivamente, é útil como medida de variação dos dados explicada pelos termos que estão no modelo maior e não estão no modelo menor.
+
+Assitoticamente, pode-se escrever:
+
+$\Delta D$ = $D_q$ - $D_p$ ~ $\mathbf{X}^{2}_{p-q}$
+
+Hipóteses:
+
+$H_0$: a diferença entre os modelos não é significativa
+
+$H_1$: a diferença entre os modelos é significativa
+
+Como o valor-p deu 0.014, rejeitamos a hipótese nula e ficamos com o modelo com mais parâmetros.
+
+Vamos conferir se a deviance é moderada:
+
+```{r echo=FALSE}
+
+
+qchisq(0.90, 1)
 
 ```
 
@@ -1680,21 +1737,118 @@ O modelo com menor AIC foi o modelo2
 
 ```{r echo=FALSE}
 
-summary(modelo2)$call
+summary(M2)$call
 
-summary(modelo2)$coefficients[,c(1,4)]
+summary(M2)$coefficients[,c(1,4)]
 
-summary(modelo2)$aic
+summary(M2)$aic
 ```
 
 Como desejado, todas as variáveis do modelo tem uma significância estatística e são relevantes para a interpretação do mesmo.
 
 ```{r echo=FALSE}
-coef_modelo2 <- exp(coef(modelo2)[2:5])
+coef_modelo2 <- exp(coef(M2)[2:5])
+
 names(coef_modelo2) <- c("Filmes", "Visita a parques, praças e espaços na natureza exibidos na tela",
                          "Satisfeito/ Indiferente/ Muito insatisfeito", "Desfrute da gastronomia retratada na tela")
+
 kable(coef_modelo2, caption = "Tabela dos coeficientes para interpretacao")
 
 
 ```
 
+```{r}
+eta = predict(M2) # preditor linear
+odds = exp(eta) # razão de chance
+ychapeu <- odds/(1+odds)
+
+Turista <- c(1:101,103:117) # o individuo 102 foi omitido no ajuste do modelo pois estava com NA, 
+
+posicao <- NULL #vetor posição dos individuos que tem o valor real "Específica" 
+
+for (i in 1:116) {
+  if (variaveis[i,1]=="1") {
+    posicao <- append(posicao, i)
+    
+  }
+}
+
+posicao2 <- NULL #vetor posição dos individuos que o modelo previu como "Específica"
+
+for (i in 1:116) {
+  if (ychapeu[i]>0.5) {
+    posicao2 <- append(posicao2, i)
+  }
+}
+```
+
+Turistas que tem o valor real Específica
+
+```{r}
+posicao
+
+```
+
+Turistas que o modelo classificou como Específica
+
+```{r}
+posicao2
+
+```
+
+### Gráfico: "Probabilidade do turista ser classificado como Específico pelo modelo"
+
+```{r,echo=FALSE}
+
+data.frame(Turista, ychapeu) %>% 
+  ggplot(aes(x=Turista, y=ychapeu)) +
+  geom_point() +
+  labs(y = "Probabilidade do turista ser Específico") +
+  geom_hline(yintercept = 0.5, colour = "red")
+
+```
+
+Análise de resíduo
+
+```{r,echo=FALSE}
+
+CD = cooks.distance(M2)
+pontos_influente <- CD[CD > 4/116]
+pontos_influente
+
+variaveis_sem_pontos_influentes <- variaveis[-106,] #retirando o ponto 106
+
+M4 <- glm(Grupo ~ Filmes + `Visita a parques, praças e espaços na natureza exibidos na tela` + Satisfação + 
+        `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas`, data = variaveis_sem_pontos_influentes,
+        family = binomial(link = "logit"))
+
+summary(M4)
+
+eta = predict(M4) # preditor linear
+odds = exp(eta) # razão de chance
+ychapeu <- odds/(1+odds)
+
+Turista <- c(1:101,103:105,107:117) # o individuo 102 e 106 foi omitido no ajuste do modelo.
+
+posicao <- NULL #vetor posição dos individuos que tem o valor real "Específica" 
+
+for (i in 1:115) {
+  if (variaveis_sem_pontos_influentes[i,1]=="1") {
+    posicao <- append(posicao, i)
+    
+  }
+}
+
+posicao2 <- NULL #vetor posição dos individuos que o modelo previu como "Específica"
+
+for (i in 1:115) {
+  if (ychapeu[i]>0.5) {
+    posicao2 <- append(posicao2, i)
+  }
+}
+
+
+
+
+
+```
