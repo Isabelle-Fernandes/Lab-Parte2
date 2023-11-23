@@ -1644,6 +1644,7 @@ Essa abordagem permite a compreensão de forma mais intuitiva como as variáveis
 
 banco[] <- lapply(banco, factor)
 str(banco)
+<<<<<<< HEAD
 
 
 modelo1 <- glm(banco$Grupo ~ banco$Filmes 
@@ -1698,3 +1699,43 @@ kable(coef_modelo2, caption = "Tabela dos coeficientes para interpretacao")
 
 ```
 
+=======
+modelo1 <- glm(banco$Grupo ~ banco$Filmes 
+               + banco$`Visita a parques, praças e espaços na natureza exibidos na tela` 
+               + banco$Experiência
+               + banco$`Visita a patrimônios culturais exibidos na tela`
+               , family = binomial(link = "logit"))
+
+summary(modelo1)
+
+#Modelo utilizando as variaveis com p-valor < 0.05 no teste qui-quadrado
+
+modelo2 <- glm(banco$Grupo ~ banco$Filmes 
+               + banco$`Visita a parques, praças e espaços na natureza exibidos na tela`
+               , family = binomial(link = "logit"))
+
+summary(modelo2)
+```
+
+O modelo que se mostrou mais parcimonioso foi justamente aquele que utilizava as variáveis mais significativas no teste qui-quadrado para explicar o grupo dos individuos. Dessa forma o modelo final ficou como:
+
+```{r echo=FALSE}
+summary(modelo2)$call
+summary(modelo2)$coefficients[,c(1,4)]
+#summary(modelo2)$aic
+```
+
+Como desejado, todas as variáveis do modelo tem uma significância estatística e são relevantes para a interpretação do mesmo.
+
+```{r echo=FALSE}
+coef_modelo2 <- exp(coef(modelo2)[2:3])
+names(coef_modelo2) <- c("Filmes", "Visita")
+kable(coef_modelo2, caption = "Tabela dos coeficientes para interpretacao")
+```
+
+A interpretação dos coeficientes do modelo se da por:
+
+- Como exp(coeficiente) da variável "Filmes" é 7.94, isso implica que um 'Sim' em "Filmes" aumenta as chances do "Grupo" ser 'Especifica' em aproximandamente 8 vezes.
+- Como exp(coeficiente) da variável "Visita a parques..." é 4.35, isso implica que um 'Sim' aumenta as chances do "Grupo" ser 'Especifica' em aproximadamente 4 vezes.
+
+>>>>>>> 98746bb42e360f876dac2eca1cc18c63a6af8524
