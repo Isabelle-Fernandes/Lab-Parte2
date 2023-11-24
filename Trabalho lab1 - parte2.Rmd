@@ -66,9 +66,13 @@ library(cowplot)
 
 <div style="text-align: justify">
 
+Este trabalho propõe uma análise das experiências dos turistas motivados por produções audiovisuais, explorando como essas influências impactam suas motivações, expectativas e percepções durante a vivência do turismo como experiência de lazer.
+
+Ao delinear os fundamentos teóricos sobre o turismo induzido pelo audiovisual, abordamos concepções, práticas dos viajantes. Focamos especialmente no "turista motivado por produções audiovisuais", buscando compreender as dinâmicas subjacentes a suas escolhas de destinos e as consequências dessas experiências.
+
 <div/>
 
-## 1.1 Objetivos Gerais do estudo
+#### 1.1 Objetivos Gerais do estudo
 
 <div style="text-align: justify">
 
@@ -77,7 +81,7 @@ influenciados pelo audiovisual.\
 
 <div/>
 
-## 1.2 Objetivos Específicos
+#### 1.2 Objetivos Específicos
 
 <div style="text-align: justify">
 
@@ -91,6 +95,24 @@ influenciados pelo audiovisual.\
 # 2 Metodologia
 
 <div style="text-align: justify">
+O presente estudo busca uma compreensão aprofundada das motivações dos turistas ao visitarem uma localidade específica, com especial ênfase na influência do audiovisual.
+
+#####  1. Tratamento do Banco de Dados:
+
+Inicialmente, o banco de dados, coletado pelo nosso cliente, passou por um processo de tratamento. Essa etapa foi crucial para garantir a integridade e relevância dos dados, permitindo uma análise estatística mais precisa.
+
+#####  2. Análise Exploratória:
+
+Utilizando estatísticas descritivas e gráficos para obter e apresentar insights preliminares sobre as variáveis presentes no banco de dados. Isso proporcionou uma compreensão inicial da distribuição e tendências dos dados, destacando padrões e anomalias que orientaram as etapas subsequentes da pesquisa.
+
+#####  3. Testes Qui-Quadrado:
+
+Para investigar as relações entre a variável de interesse, representada pelo grupo dos participantes, e outras variáveis relevantes, empregamos testes qui-quadrado. Com isso determinamos se existem associações significativas entre as variáveis, revelando fatores que influenciam a motivação dos turistas. Os resultados orientaram a seleção das variáveis mais relevantes para o modelo de regressão logística.
+
+#####  4. Modelo de Regressão Logística:
+
+Com base nas variáveis identificadas como estatisticamente significativas nos testes qui-quadrado, desenvolvemos um modelo de regressão logística explorando a relação entre as variáveis independentes selecionadas e a variável dependente de interesse.
+
 
 <div/>
 
@@ -99,6 +121,8 @@ influenciados pelo audiovisual.\
 # 3 Resultados
 
 <div style="text-align: justify">
+
+Os resultados são apresentados de maneira abrangente, com gráficos, testes estatísticos para avaliação das variáveis e tabelas que descrevem os dados no geral. Além disso, empregamos a regressão logística para compreendermos de forma mais intuitiva a relação das variáveis explicativas com a variável de interesse.
 
 <div/>
 
@@ -1934,7 +1958,7 @@ data.frame(turista, fit) %>%
 ```
 
 
-```{r, eval=FALSE, message=FALSE, warning=FALSE}
+```{r eval=FALSE, message=FALSE, warning=FALSE, echo = FALSE}
 
 
 yreal <- NULL #vetor posição dos individuos que tem o valor real "Específica" 
@@ -1954,3 +1978,11 @@ for (i in 1:116) {
 }
 
 ```
+
+# 4. Conclusao
+
+<div style="text-align: justify">
+
+A análise descritiva e estatística dos dados revelou, as variáveis mais influentes no contexto da motivação de turistas por produções audiovisuais. Destacaram-se, entre elas, as perguntas relacionadas às *atividades de lazer durante a viagem*, *preferências em produções audiovisuais* e o *nível de satisfação com a experiência audiovisual-induzida*. Esses insights forneceram uma compreensão mais profunda das dinâmicas envolvidas e também direcionaram a construção do modelo final de regressão logística. Ao apresentar esse modelo, buscamos não apenas descrever, mas também prever a propensão de um indivíduo integrar o grupo de turistas motivados pelo audiovisual, fazendo assim para uma abordagem extensiva e preditiva nas pesquisas sobre o tema.
+
+<div/>
