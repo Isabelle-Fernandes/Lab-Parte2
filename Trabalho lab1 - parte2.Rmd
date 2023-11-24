@@ -81,9 +81,8 @@ influenciados pelo audiovisual.\
 
 <div style="text-align: justify">
 
--   Fazer uma análise por grupo de entrevistados;
-
--   fazer uma análise estatística da pesquisa.\
+- Fazer uma análise por grupo de entrevistados;
+- fazer uma análise estatística da pesquisa.\
 
     <div/>
 
@@ -1635,7 +1634,7 @@ kable(tabela)
 
 ```
 
-# 4 - Modelo de regressão logistica
+## 3.2 - Modelo de regressão logística
 
 <div style="text-align: justify">
 
@@ -1680,7 +1679,7 @@ str(variaveis)
 
 **Estimação do modelo de regrgessão logística**
 
-```{r include=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 # Modelo utilizando somente as variaveis com p-valor < 0.15 no teste qui-quadrado
 
@@ -1724,14 +1723,17 @@ significativos. Utilizamos os Testes de de independência para nortear
 quais variáveis seriam colocadas a princípio no modelo.
 
 O modelo 1, como mostrado abaixo, a variável binária grupo é explicada
-pelas variáveis: - Visita a parques, praças e espaços na natureza
-exibidos na tela; - Filmes; - Satisfação; - Desfrute da gastronomia
-retratada na tela, incluindo alimentos e bebidas.
+pelas variáveis: 
+- Visita a parques, praças e espaços na natureza exibidos na tela; 
+- Filmes; 
+- Satisfação; 
+- Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas.
 
 O modelo 2, como mostrado abaixo, a variável binária grupo é explicada
-pelas variáveis: - Visita a parques, praças e espaços na natureza
-exibidos na tela; - Filmes; - Desfrute da gastronomia retratada na tela,
-incluindo alimentos e bebidas.
+pelas variáveis: 
+- Visita a parques, praças e espaços na natureza exibidos na tela; 
+- Filmes; 
+- Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas.
 
 É preciso saber se o modelo maior (modelo 1) é significativamente
 superior ao modelo menor (modelo 2), ou seja, se a varíavel "Satisfação"
@@ -1745,7 +1747,7 @@ Estatística de modelos encaixados, a partir da deviance dos modelos.
 
 **Análise de modelos encaixados**
 
-```{r echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 kable(anova(M2,M1, test="LR")) 
 
@@ -1779,8 +1781,10 @@ contribui para explicar a variabilidade dos dados.
 **Análise de deviance**
 
 ```{r, eval = FALSE, include = FALSE}
+
 M1$deviance
 qchisq(0.95,112)
+
 ```
 
 Agora, é preciso conferir se a deviance do modelo escolhido é moderada.
@@ -1801,9 +1805,9 @@ considerá-la moderada. Também, o percentil da distribuição
 $\mathbf{X}^{2}_{112}$ com \alpha = 0.05 é 137.7015. Como 0 \< 0 \<
 137.7015, o modelo possui deviance moderada.
 
-# Tabela - Regressores, coeficientes, Valor-p e $\mathbf{e}^{\eta}$
+# Tabela - Regressores, coeficientes, Valor-p e impacto da covariável sobre a odds
 
-```{r, echo = FALSE, include = FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 coeficiente <- coef(M1)
 
 names(coeficiente) <- c("Intercepto", "Filmes_Sim", "Visita a parques, praças e espaços na natureza exibidos na tela_Sim",
@@ -1815,7 +1819,7 @@ exp <- exp(coef(M1))
 
 coeficiente <- data.frame(coeficiente, round(pvalor,4), exp)
 
-colnames(coeficiente) <- c("Coeficiente", "Valor-p", "exp{beta}")
+colnames(coeficiente) <- c("Coeficiente", "Valor-p", "100*(exp{beta}-1)")
 
 kable(coeficiente)
 
@@ -1823,7 +1827,7 @@ kable(coeficiente)
 
 **Análise de resíduos**
 
-```{r, echo = FALSE, include = FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 CD = cooks.distance(M1)
 pontos_influente <- CD[CD > 4/116]
 
@@ -1852,9 +1856,9 @@ plot_cooksd(M1)
 
 Reajustaremos o modelo sem a observação 106 e será comparado se os coeficientes da regressão alteram muito.
 
-# Tabela - Regressores, coeficientes, Valor-p e $\mathbf{e}^{\eta}$
+# Tabela - Regressores, coeficientes, Valor-p e impacto da covariável sobre a odds
 
-```{r, echo = FALSE, include = FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 variaveissem <- variaveis[-106,]
 
 M3 <- glm(Grupo ~ `Visita a parques, praças e espaços na natureza exibidos na tela` +
@@ -1870,23 +1874,24 @@ names(coeficiente) <- c("Intercepto", "Filmes_Sim", "Visita a parques, praças e
 
 pvalor <- as.data.frame(summary(M3)$coef[, "Pr(>|z|)"])
 
-exp <- exp(coef(M3))
+exp <- 100*(exp(coef(M3))-1)
 
 coeficiente <- data.frame(coeficiente, round(pvalor,4), exp)
 
-colnames(coeficiente) <- c("Coeficiente", "Valor-p", "exp{beta}")
+colnames(coeficiente) <- c("Coeficiente", "Valor-p", "100*(exp{beta}-1)")
 
 kable(coeficiente)
 ```
 
+Os valores dos coeficientes não são muito diferentes se comparado ao modelo proposto. Logo, não será retirada a observação e será considerado o modelo inicial.
+
 # Gráficos de resíduos contra os valores ajustados do modelo
 
-```{r, echo = FALSE, include = FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 eta = predict(M1) # preditor linear
 odds = exp(eta) # razão de chance
 ychapeu <- odds/(1+odds)
-
 
 # fit = ychapeu 
 
@@ -1906,11 +1911,11 @@ ggplot(
 
 A curva Lowess mostra proximidade ao patamar 0. Contudo, ela apresenta formato de parábola, o que indica a necessidade de ajustar o MLG logístico com efeito quadrático de alguma covariáavel. Contudo, como as variáveis são todas binárias, essa transformação não teria efeito. Assim, o modelo possível obtido é este.
 
-Por, abaixo o gráfico evidencia a probalidade de um indvpiduo ser classificado como pertencente ao grupo "específico", conforme o modelo prevê. Os valores reais do grupo são 27
+Por, abaixo o gráfico evidencia a probalidade de um indvpiduo ser classificado como pertencente ao grupo "específico", conforme o modelo prevê.
 
 ### Gráfico: "Probabilidade do turista ser classificado como Específico pelo modelo"
 
-```{r,eval=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 turista <- c(1:101, 103:117)
 
@@ -1920,7 +1925,7 @@ data.frame(turista, fit) %>%
   labs(y = "Probabilidade do turista ser Específico",
        x="Observação") +
   geom_hline(yintercept = 0.5, colour = "red", size=0.5) +
-  geom_point()
+  geom_point() +
   theme_light()
   
 
@@ -1929,29 +1934,23 @@ data.frame(turista, fit) %>%
 ```
 
 
-
-```{r,eval=FALSE}
-
+```{r, eval=FALSE, message=FALSE, warning=FALSE}
 
 
-posicao <- NULL #vetor posição dos individuos que tem o valor real "Específica" 
+yreal <- NULL #vetor posição dos individuos que tem o valor real "Específica" 
+
+for (i in turista) {
+  if (variaveis[i,1]=="1") {
+    yreal <- append(yreal, i)
+  }
+}
+
+yprevisto <- NULL #vetor posição dos individuos que o modelo previu como "Específica"
 
 for (i in 1:116) {
-  if (variaveis[i,1]=="1") {
-    posicao <- append(posicao, i)
+  if (fit[i]>0.5) {
+    yprevisto <- append(yprevisto, i)
   }
 }
-
-posicao2 <- NULL #vetor posição dos individuos que o modelo previu como "Específica"
-
-for (i in 1:115) {
-  if (ychapeu[i]>0.5) {
-    posicao2 <- append(posicao2, i)
-  }
-}
-
-
-
-
 
 ```
