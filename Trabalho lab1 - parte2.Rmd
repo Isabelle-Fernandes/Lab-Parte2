@@ -1689,7 +1689,7 @@ M <- glm(Grupo ~ `Visita a parques, praças e espaços na natureza exibidos na t
         `Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas` +
           Idade, data = variaveis,
                family = binomial(link = "logit"))
-# summary(M)
+# summary(M2)
 
 #Modelo retirando variável idade
 
@@ -1815,7 +1815,7 @@ names(coeficiente) <- c("Intercepto", "Filmes_Sim", "Visita a parques, praças e
 
 pvalor <- as.data.frame(summary(M1)$coef[, "Pr(>|z|)"])
 
-exp <- exp(coef(M1))
+exp <- 100*(exp(coef(M1))-1)
 
 coeficiente <- data.frame(coeficiente, round(pvalor,4), exp)
 
@@ -1954,5 +1954,3 @@ for (i in 1:116) {
 }
 
 ```
-
-# 4. Conclusão
