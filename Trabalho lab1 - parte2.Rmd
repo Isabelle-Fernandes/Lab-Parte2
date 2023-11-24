@@ -3,12 +3,13 @@ title: 'Relatório: 2ª Rodada Laboratório 1'
 author: "Joaquim e Isabelle"
 date: "19-11-2023"
 output:
+  word_document: default
   html_document:
     df_print: paged
   pdf_document: default
-editor_options: 
+editor_options:
   chunk_output_type: console
-  markdown: 
+  markdown:
     wrap: 72
 ---
 
@@ -88,10 +89,10 @@ influenciados pelo audiovisual.\
 - Fazer uma análise por grupo de entrevistados;
 - fazer uma análise estatística da pesquisa.\
 
-    <div/>
+<div/>    
 
-    \newpage
 
+\newpage
 # 2 Metodologia
 
 <div style="text-align: justify">
@@ -1815,21 +1816,20 @@ Agora, é preciso conferir se a deviance do modelo escolhido é moderada.
 Para decidir se uma deviance é pequena / moderada / grande, podemos usar
 como referência:
 
--   o percentil $\mathbf{X}^{2}_{n-p}$, onde "n" é o tamanho da amostra (116) e "p" o número de parêmetros (4).
+O percentil $\mathbf{X}^{2}_{n-p}$, onde "n" é o tamanho da amostra (116) e "p" o número de parêmetros (4).
 
-Se P(D \> $\mathbf{X}^{2}_{n-p;\alpha}$) = \alpha; neste caso, 0 \< D \<
+Se P(D \> $\mathbf{X}^{2}_{n-p;\alpha}$) = $\alpha$; neste caso, 0 \< D \<
 $\mathbf{X}^{2}_{n-p;\alpha}$ indica deviance pequena ou moderada.
 
 O valor esperado $\mathbf{X}^{2}_{n-p;\alpha}$ que é igual (n - p);
 neste caso, uma deviance moderada estaria próxima de n − p.
 
-Para o modelo, D = 100.0668. A média da distribuição
-$\mathbf{X}^{2}_{12}$ é 112. D está próximo da média, logo podemos
+Para o modelo, D = 100.0668. A média da distribuição $\mathbf{X}^{2}_{12}$ é 112. D está próximo da média, logo podemos
 considerá-la moderada. Também, o percentil da distribuição
-$\mathbf{X}^{2}_{112}$ com \alpha = 0.05 é 137.7015. Como 0 \< 0 \<
+$\mathbf{X}^{2}_{112}$ com $\alpha$ = 0.05 é 137.7015. Como 0 \< 0 \<
 137.7015, o modelo possui deviance moderada.
 
-# Tabela - Regressores, coeficientes, Valor-p e impacto da covariável sobre a odds
+### Tabela - Regressores, coeficientes, Valor-p e impacto da covariável sobre a odds
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 coeficiente <- coef(M1)
@@ -1880,7 +1880,7 @@ plot_cooksd(M1)
 
 Reajustaremos o modelo sem a observação 106 e será comparado se os coeficientes da regressão alteram muito.
 
-# Tabela - Regressores, coeficientes, Valor-p e impacto da covariável sobre a odds
+### Tabela - Regressores, coeficientes, Valor-p e impacto da covariável sobre a odds
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 variaveissem <- variaveis[-106,]
@@ -1909,7 +1909,7 @@ kable(coeficiente)
 
 Os valores dos coeficientes não são muito diferentes se comparado ao modelo proposto. Logo, não será retirada a observação e será considerado o modelo inicial.
 
-# Gráficos de resíduos contra os valores ajustados do modelo
+### Gráfico: Resíduos contra os valores ajustados do modelo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -1979,7 +1979,8 @@ for (i in 1:116) {
 
 ```
 
-# 4. Conclusao
+\newpage
+# 4. Conclusão
 
 <div style="text-align: justify">
 
