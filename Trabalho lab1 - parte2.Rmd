@@ -94,9 +94,6 @@ influenciados pelo audiovisual.\
 
 # 2 Metodologia
 
-<div style="text-align: justify">
-O presente estudo busca uma compreensão aprofundada das motivações dos turistas ao visitarem uma localidade específica, com especial ênfase na influência do audiovisual.
-
 #####  1. Tratamento do Banco de Dados:
 
 Inicialmente, o banco de dados, coletado pelo nosso cliente, passou por um processo de tratamento. Essa etapa foi crucial para garantir a integridade e relevância dos dados, permitindo uma análise estatística mais precisa.
@@ -1620,15 +1617,14 @@ kable(tabela)
 **Teste qui-quadrado de independência**
 
 Esse teste é utilizado para verificar se existe associação entre as
-variáveis grupo com cada uma das outras variáveis qualitativas.
+variáveis grupo com cada uma das outras variáveis categóricas.
 
 Hipóteses:
 
 $H_0$: As variáveis **grupo** com cada uma das outras variáveis são
-independentes
+independentes.
 
-$H_1$: As variáveis **grupo** com cada uma das outras variáveis são
-independentes estão associadas
+$H_1$: As variáveis **grupo** com cada uma das outras variáveis estão associadas.
 
 ### Tabela resumo - teste qui-quadrado descritiva para cada variável
 
@@ -1742,18 +1738,18 @@ M2 <- glm(Grupo ~`Visita a parques, praças e espaços na natureza exibidos na t
 
 <div style="text-align: justify">
 
-Foram estimados dois modelos que todos os coeficientes deram
+Foram estimados dois modelos em que todos os coeficientes são
 significativos. Utilizamos os Testes de de independência para nortear
 quais variáveis seriam colocadas a princípio no modelo.
 
-O modelo 1, como mostrado abaixo, a variável binária grupo é explicada
+No modelo 1, como mostrado abaixo, a variável binária grupo é explicada
 pelas variáveis: 
 - Visita a parques, praças e espaços na natureza exibidos na tela; 
 - Filmes; 
 - Satisfação; 
 - Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas.
 
-O modelo 2, como mostrado abaixo, a variável binária grupo é explicada
+No modelo 2, como mostrado abaixo, a variável binária grupo é explicada
 pelas variáveis: 
 - Visita a parques, praças e espaços na natureza exibidos na tela; 
 - Filmes; 
@@ -1788,7 +1784,7 @@ parâmetros dos modelos, respectivamente, é útil como medida de variação
 dos dados explicada pelos termos que estão no modelo maior e não estão
 no modelo menor.
 
-Assitoticamente, pode-se escrever:
+Assin   toticamente, pode-se escrever:
 
 $\Delta D$ = $D_q$ - $D_p$ \~ $\mathbf{X}^{2}_{p-q}$
 
@@ -1817,16 +1813,16 @@ como referência:
 
 -   o percentil $\mathbf{X}^{2}_{n-p}$, onde "n" é o tamanho da amostra (116) e "p" o número de parêmetros (4).
 
-Se P(D \> $\mathbf{X}^{2}_{n-p;\alpha}$) = \alpha; neste caso, 0 \< D \<
+Se P(D \> $\mathbf{X}^{2}_{n-p;\alpha}$) = $\alpha$  Neste caso, 0 \< D \<
 $\mathbf{X}^{2}_{n-p;\alpha}$ indica deviance pequena ou moderada.
 
 O valor esperado $\mathbf{X}^{2}_{n-p;\alpha}$ que é igual (n - p);
-neste caso, uma deviance moderada estaria próxima de n − p.
+neste caso, uma deviance moderada estaria próxima de (n − p).
 
 Para o modelo, D = 100.0668. A média da distribuição
 $\mathbf{X}^{2}_{12}$ é 112. D está próximo da média, logo podemos
 considerá-la moderada. Também, o percentil da distribuição
-$\mathbf{X}^{2}_{112}$ com \alpha = 0.05 é 137.7015. Como 0 \< 0 \<
+$\mathbf{X}^{2}_{112}$ com \alpha = 0.05 é 137.7015. Como 0 \< 100 \<
 137.7015, o modelo possui deviance moderada.
 
 # Tabela - Regressores, coeficientes, Valor-p e impacto da covariável sobre a odds
@@ -1979,10 +1975,14 @@ for (i in 1:116) {
 
 ```
 
+\newpage
+
 # 4. Conclusao
 
 <div style="text-align: justify">
 
-A análise descritiva e estatística dos dados revelou, as variáveis mais influentes no contexto da motivação de turistas por produções audiovisuais. Destacaram-se, entre elas, as perguntas relacionadas às *atividades de lazer durante a viagem*, *preferências em produções audiovisuais* e o *nível de satisfação com a experiência audiovisual-induzida*. Esses insights forneceram uma compreensão mais profunda das dinâmicas envolvidas e também direcionaram a construção do modelo final de regressão logística. Ao apresentar esse modelo, buscamos não apenas descrever, mas também prever a propensão de um indivíduo integrar o grupo de turistas motivados pelo audiovisual, fazendo assim para uma abordagem extensiva e preditiva nas pesquisas sobre o tema.
+A análise descritiva e estatística dos dados revelou, as variáveis mais influentes no contexto da motivação de turistas por produções audiovisuais. Destacaram-se, entre elas, as perguntas relacionadas às *atividades de lazer durante a viagem*, *preferências em produções audiovisuais* e o *nível de satisfação com a experiência audiovisual-induzida*.
+
+Esses insights forneceram uma compreensão mais profunda das dinâmicas envolvidas e também direcionaram a construção do modelo final de regressão logística. Ao apresentar esse modelo, buscamos não apenas descrever, mas também prever a propensão de um indivíduo integrar o grupo de turistas motivados pelo audiovisual, fazendo assim para uma abordagem extensiva e preditiva nas pesquisas sobre o tema.
 
 <div/>
