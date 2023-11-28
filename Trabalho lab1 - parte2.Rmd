@@ -9,7 +9,7 @@ output:
     df_print: paged
   word_document: default
 editor_options:
-  chunk_output_type: console
+  chunk_output_type: inline
   markdown:
     wrap: 72
 ---
@@ -124,7 +124,23 @@ Com base nas variáveis identificadas como estatisticamente significativas nos t
 
 <div style="text-align: justify">
 
-Os resultados são apresentados de maneira abrangente, com gráficos, testes estatísticos para avaliação das variáveis e tabelas que descrevem os dados no geral. Além disso, empregamos a regressão logística para compreendermos de forma mais intuitiva a relação das variáveis explicativas com a variável de interesse.
+Os resultados são apresentados de maneira abrangente, com gráficos, testes estatísticos para avaliação das variáveis e tabelas que descrevem os dados no geral. Além disso, foram empregadas a regressão logística para compreender a relação das variáveis explicativas com a variável de interesse. 
+
+<div/>
+
+<div style="text-align: justify">
+
+**Teste qui-quadrado de independência**
+
+Foi aplicado o teste qui-quadrado para verificar se existe associação entre as variáveis grupo com cada uma das outras variáveis qualitativas.
+
+Hipóteses:
+
+$H_0$: As variáveis **grupo** com outra variável de interesse são independentes
+
+$H_1$: As variáveis **grupo** com outra variável de interesse estão associadas
+
+Caso o valor-p do teste seja inferior a 0.05, então rejeitamos $H_0$ e acredita-se com que as variáveis analisadas estejam associadas. Em outras palavras, significa dizer que a proporção do cruzamento das duas variáveis é significativa.
 
 <div/>
 
@@ -425,7 +441,13 @@ grafico2 <- banco %>%
 
 
 plot_grid(grafico1, grafico2, ncol = 1)
-chisq.test(banco$Grupo, banco$Sexo)
+qui <- chisq.test(banco$Grupo, banco$Sexo)[[3]]
+
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
+```
+
+```
+paste("Valor-p do teste qui-quadrado:", round(qui, 4),".")
 
 ```
 
@@ -458,8 +480,8 @@ grafico2 <- banco %>%
   theme(legend.title = element_text(size = 10))
 
 plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
-chisq.test(banco$Grupo, banco$Idade)
-
+qui <- chisq.test(banco$Grupo, banco$Idade)[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 4: Escolaridade por grupo
@@ -493,8 +515,8 @@ grafico2 <- banco %>%
   theme(legend.title = element_text(size = 10))
 
 plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
-chisq.test(banco$Grupo, banco$Escolaridade)
-
+qui <- chisq.test(banco$Grupo, banco$Escolaridade)[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 5: Região de residência por grupo
@@ -529,8 +551,8 @@ grafico2 <- banco %>%
   theme(legend.title = element_text(size = 10)) 
 
 plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
-chisq.test(banco$Grupo, banco$`Região residência`)
-
+qui <- chisq.test(banco$Grupo, banco$`Região residência`)[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 
 ```
 
@@ -565,8 +587,8 @@ grafico2 <- banco %>%
   theme(legend.title = element_text(size = 10)) 
 
 plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
-chisq.test(banco$Grupo, banco$`Frequência audiovisuais`)
-
+qui <- chisq.test(banco$Grupo, banco$`Frequência audiovisuais`)[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 7: Assinatura streaming por grupo
@@ -600,8 +622,8 @@ grafico2 <- banco %>%
   theme(legend.title = element_text(size = 10)) 
 
 plot_grid(grafico1, grafico2, ncol = 1)
-chisq.test(banco$Grupo, banco$`Assinatura streaming`)
-
+qui <- chisq.test(banco$Grupo, banco$`Assinatura streaming`)[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 8: Motivação da viagem por grupo
@@ -649,8 +671,8 @@ grafico2 <- banco %>%
 
 
 plot_grid(grafico1, grafico2, ncol = 1)
-chisq.test(banco$Grupo, banco$Motivação)
-
+qui <- chisq.test(banco$Grupo, banco$Motivação)[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 9: Locais visitados estavam de acordo com os retratados em produção audiovisual por grupo
@@ -684,8 +706,8 @@ grafico2 <- banco %>%
   theme(legend.title = element_text(size = 10)) 
 
 plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
-chisq.test(banco$Grupo, banco$Percepção)
-
+qui <- chisq.test(banco$Grupo, banco$Percepção)[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 10: Companhia da viagem por grupo
@@ -722,8 +744,8 @@ grafico2 <- banco %>%
 
 
 plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
-chisq.test(banco$Grupo, banco$Companhia)
-
+qui <- chisq.test(banco$Grupo, banco$Companhia)[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 11: Satisfação com viagem induzida pelo audiovisual por grupo
@@ -760,8 +782,8 @@ grafico2 <- banco %>%
 
 
 plot_grid(grafico1, grafico2, ncol = 1, rel_widths = c(0.8, 1.2))
-chisq.test(banco$Grupo, banco$Satisfação)
-
+qui <- chisq.test(banco$Grupo, banco$Satisfação)[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 12: Realizar outra viagem pelo audiovisual por grupo
@@ -795,7 +817,8 @@ grafico2 <- banco %>%
 
 
 plot_grid(grafico1, grafico2, ncol = 1)
-chisq.test(banco$Grupo, banco$`Realizar outra viagem pelo audiovisual`)
+qui <- chisq.test(banco$Grupo, banco$`Realizar outra viagem pelo audiovisual`)[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 13: Consumo de produção audiovisual
@@ -911,35 +934,40 @@ graficos5 <- lista[[5]] %>%
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos1
-chisq.test(data[,1], data[,2]) #Estão associadas
+qui <- chisq.test(data[,1], data[,2])[[3]] #Estão associadas
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 15: Turistas que assistem novelas por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos2
-chisq.test(data[,1], data[,3])
+qui <- chisq.test(data[,1], data[,3])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 16: Turistas que assistem seriados por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos3
-chisq.test(data[,1], data[,4])
+qui <- chisq.test(data[,1], data[,4])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 17: Turistas que assistem clipes de música por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos4
-chisq.test(data[,1], data[,5])
+qui <- chisq.test(data[,1], data[,5])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 18: Turistas que assistem outro produto audiovisual por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos5
-chisq.test(data[,1], data[,6])
+qui <- chisq.test(data[,1], data[,6])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 19: Produção audiovisual consumida pelos turistas
@@ -1111,63 +1139,72 @@ graficos9 <- lista[[9]] %>%
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos1
-chisq.test(data[,1], data[,2]) #Estão associadas
+qui <- chisq.test(data[,1], data[,2])[[3]] #Estão associadas
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 21: Turistas que assinam Globoplay por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos2
-chisq.test(data[,1], data[,3])
+qui <- chisq.test(data[,1], data[,3])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 22: Turistas que assinam Amazon Prime Video por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos3
-chisq.test(data[,1], data[,4])
+qui <- chisq.test(data[,1], data[,4])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 23: Turistas que assinam HBO Max por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos4
-chisq.test(data[,1], data[,5])
+qui <- chisq.test(data[,1], data[,5])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 24: Turistas que assinam Disney+ por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos5
-chisq.test(data[,1], data[,6])
+qui <- chisq.test(data[,1], data[,6])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 25: Turistas que assinam Telecine por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos6
-chisq.test(data[,1], data[,7])
+qui <- chisq.test(data[,1], data[,7])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 26: Turistas que assinam Star+ por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos7
-chisq.test(data[,1], data[,8])
+qui <- chisq.test(data[,1], data[,8])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 27: Turistas que assinam Viki por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos8
-chisq.test(data[,1], data[,9])
+qui <- chisq.test(data[,1], data[,9])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 28: Turistas que assinam Outros streamig por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos9
-chisq.test(data[,1], data[,10])
+qui <- chisq.test(data[,1], data[,10])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 Precisa fazer a mesma coisa feita do result2 para as demais...
@@ -1346,63 +1383,72 @@ graficos9 <- lista[[9]] %>%
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos1
-chisq.test(data[,1], data[,2]) #Estão associadas
+qui <- chisq.test(data[,1], data[,2])[[3]] #Estão associadas
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 31: Turistas que realizaram a atividade Visita a Parques temáticos baseados em atrações inspiradas em séries, filmes, etc por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos2
-chisq.test(data[,1], data[,3])
+qui <- chisq.test(data[,1], data[,3])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 32: Turistas que realizaram a atividade Visita a cenários internos ou externos onde foram filmadas por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos3
-chisq.test(data[,1], data[,4])
+qui <- chisq.test(data[,1], data[,4])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 33: Turistas que realizaram a atividade Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos4
-chisq.test(data[,1], data[,5])
+qui <- chisq.test(data[,1], data[,5])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 34: Turistas que realizaram a atividade Participação em eventos relacionados a filmes por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos5
-chisq.test(data[,1], data[,6])
+qui <- chisq.test(data[,1], data[,6])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 35: Turistas que realizaram a atividade Visita a estabelecimentos exibidos na tela, como bares, restaurantes e outros por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos6
-chisq.test(data[,1], data[,7])
+qui <- chisq.test(data[,1], data[,7])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 36: Turistas que realizaram a atividade Realização de roteiros guiados em locais de filmagem por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos7
-chisq.test(data[,1], data[,8])
+qui <- chisq.test(data[,1], data[,8])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 37: Turistas que realizaram a atividade Outra atividade por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos8
-chisq.test(data[,1], data[,9])
+qui <- chisq.test(data[,1], data[,9])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 38: Turistas que realizaram a atividade Visita a patrimônios culturais exibidos na tela por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos9
-chisq.test(data[,1], data[,10])
+qui <- chisq.test(data[,1], data[,10])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 39: Produção audiovisual consumida pelos turistas
@@ -1559,56 +1605,64 @@ graficos8 <- lista[[8]] %>%
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos1
-chisq.test(data[,1], data[,2]) 
+qui <- chisq.test(data[,1], data[,2])[[3]] 
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 41: Turistas que teve o sentimento autorrealização despertado durante a viagem por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos2
-chisq.test(data[,1], data[,3])
+qui <- chisq.test(data[,1], data[,3])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 42: Turistas que teve o sentimento escapismo da realidade despertado durante a viagem por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos3
-chisq.test(data[,1], data[,4])
+qui <- chisq.test(data[,1], data[,4])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 43: Turistas que teve o sentimento fantasia despertado durante a viagem por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos4
-chisq.test(data[,1], data[,5])
+qui <- chisq.test(data[,1], data[,5])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 44: Turistas que teve o sentimento encantamento despertado durante a viagem por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos5
-chisq.test(data[,1], data[,6])
+qui <- chisq.test(data[,1], data[,6])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 45: Turistas que teve o sentimento romance despertado durante a viagem por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos6
-chisq.test(data[,1], data[,7])
+qui <- chisq.test(data[,1], data[,7])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 46: Turistas que teve o sentimento supeação de desafios despertados durante a viagem por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos7
-chisq.test(data[,1], data[,8])
+qui <- chisq.test(data[,1], data[,8])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Gráfico 47: Turistas que teve o outros sentimentos despertados durante a viagem por grupo
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 graficos8
-chisq.test(data[,1], data[,9])
+qui <- chisq.test(data[,1], data[,9])[[3]]
+cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese nula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula e acredita-se que as variáveis estão associadas." ))))
 ```
 
 ### Tabela 1 - Resumo estatística descritiva para cada variável
@@ -1636,19 +1690,6 @@ tabela$Nível[tabela$Nível == 0] <- "Não"
 kable(tabela)
 
 ```
-
-**Teste qui-quadrado de independência**
-
-Esse teste é utilizado para verificar se existe associação entre as
-variáveis grupo com cada uma das outras variáveis qualitativas.
-
-Hipóteses:
-
-$H_0$: As variáveis **grupo** com cada uma das outras variáveis são
-independentes
-
-$H_1$: As variáveis **grupo** com cada uma das outras variáveis são
-independentes estão associadas
 
 ### Tabela 2 - Resumo teste qui-quadrado descritiva para cada variável
 
@@ -1901,7 +1942,8 @@ plot_cooksd <- function(object){
     geom_point() +
     geom_abline(intercept = f, slope = 0, color = "red", linetype="dashed") +
     geom_segment(aes(x = seq_along(.data$cooksd), y = 0, xend = seq_along(.data$cooksd), yend = .data$cooksd)) +
-    labs(x="Observação") +
+    labs(x="Observação",
+         y="Distência de Cook") +
     ylim(range(c(0, f, cooksd$cooksd))) +
     theme(legend.position="none") +
     theme_light() 
