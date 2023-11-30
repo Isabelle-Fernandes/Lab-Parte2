@@ -446,10 +446,6 @@ qui <- chisq.test(banco$Grupo, banco$Sexo)[[3]]
 cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else(qui>0.05, "Como o valor-p é superior a 0.05, não rejeitamos a hipótese \nnula e acredita-se que as variáveis são independentes.", "Como o valor-p é inferior a 0.05, rejeitamos a hipótese nula\n e acredita-se que as variáveis estão associadas." ))))
 ```
 
-```
-paste("Valor-p do teste qui-quadrado:", round(qui, 4),".")
-
-```
 
 ### Gráfico 3: Faixa etária por grupo
 
@@ -628,7 +624,7 @@ cat(paste0("Valor-p do teste qui-quadrado: ", round(qui, 4),". ", paste0(if_else
 
 ### Gráfico 8: Motivação da viagem por grupo
 
-```{r,  plot-wider, echo=FALSE, message=FALSE, warning=FALSE}
+```{r,  plot-wider, fig.width=10, fig.height=8, echo=FALSE, message=FALSE, warning=FALSE}
 grafico1 <- result[20:23,] %>% 
   na.omit() %>% 
   ggplot(aes(x=reorder(Nível, -Quantidade), y=Quantidade, label = Percentual, fill = reorder(Nível, -Quantidade))) + 
@@ -1776,7 +1772,7 @@ variaveis <- map_df(variaveis, as.factor)
 
 ```
 
-**Estimação do modelo de regrgessão logística**
+**Estimação do modelo de regressão logística**
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -1820,18 +1816,18 @@ M2 <- glm(Grupo ~`Visita a parques, praças e espaços na natureza exibidos na t
 
 <div style="text-align: justify">
 
-Foram estimados dois modelos que todos os coeficientes deram
+Foram estimados dois modelos em que todos os coeficientes deram
 significativos. Utilizamos os Testes de de independência para nortear
-quais variáveis seriam colocadas a princípio no modelo.
+quais variáveis seriam utilizadas a princípio no modelo.
 
-O modelo 1, como mostrado abaixo, a variável binária grupo é explicada
+No modelo 1, como mostrado abaixo, a variável binária grupo é explicada
 pelas variáveis: 
 - Visita a parques, praças e espaços na natureza exibidos na tela; 
 - Filmes; 
 - Satisfação; 
 - Desfrute da gastronomia retratada na tela, incluindo alimentos e bebidas.
 
-O modelo 2, como mostrado abaixo, a variável binária grupo é explicada
+No modelo 2, como mostrado abaixo, a variável binária grupo é explicada
 pelas variáveis: 
 - Visita a parques, praças e espaços na natureza exibidos na tela; 
 - Filmes; 
@@ -1839,11 +1835,11 @@ pelas variáveis:
 
 É preciso saber se o modelo maior (modelo 1) é significativamente
 superior ao modelo menor (modelo 2), ou seja, se a varíavel "Satisfação"
-consegue melhorar na previsão de classificação do grupo. Caso a resposta
+consegue melhorar a previsão de classificação do grupo. Caso a resposta
 seja não, optaremos pelo modelo 2 por ser mais parcimonioso.
 
 Para isso, será preciso realizar a análise do que é chamado em
-Estatística de modelos encaixados, a partir da deviance dos modelos.
+Estatística de modelos encaixados, e observaremos a deviance dos modelos.
 
 <div/>
 
@@ -1866,7 +1862,7 @@ parâmetros dos modelos, respectivamente, é útil como medida de variação
 dos dados explicada pelos termos que estão no modelo maior e não estão
 no modelo menor.
 
-Assitoticamente, pode-se escrever:
+Assintoticamente, pode-se escrever:
 
 $\Delta D$ = $D_q$ - $D_p$ \~ $\mathbf{X}^{2}_{p-q}$
 
@@ -2014,7 +2010,7 @@ ggplot(
 
 A curva Lowess mostra proximidade ao patamar 0. Contudo, ela apresenta formato de parábola, o que indica a necessidade de ajustar o MLG logístico com efeito quadrático de alguma covariáavel. Contudo, como as variáveis são todas binárias, essa transformação não teria efeito. Assim, o modelo possível obtido é este.
 
-Por, abaixo o gráfico evidencia a probalidade de um indvpiduo ser classificado como pertencente ao grupo "específico", conforme o modelo prevê.
+Abaixo podemos ver o gráfico que evidencia a probalidade de um individuo ser classificado como pertencente ao grupo "específico", conforme o modelo prevê.
 
 ### Gráfico 50: Probabilidade do turista ser classificado como "Específico" pelo modelo
 
@@ -2057,6 +2053,7 @@ for (i in 1:116) {
 }
 
 ```
+
 
 \newpage
 
